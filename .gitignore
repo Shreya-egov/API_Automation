@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Testing
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+
+# Output files
+output/*.txt
+output/*.json
+output/*.xlsx
+output/*.csv
+!output/.gitkeep
+
+# Reports
+reports/*.html
+reports/*.xml
+!reports/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+utils/.env
+
+# OS
+.DS_Store
+Thumbs.db

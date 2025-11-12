@@ -1,0 +1,43 @@
+{
+    "RequestInfo": {
+        "apiId": "Rainmaker",
+        "authToken": "",
+        "userInfo": {
+            "id": 1284,
+            "uuid": "867ba408-1b82-4746-8274-eb916e625fea",
+            "userName": "EMP57",
+            "name": "Jagan",
+            "mobileNumber": "6667776662",
+            "emailId": "xyz@egovernments.org",
+            "locale": "string",
+            "type": "EMPLOYEE",
+            "roles": [
+                {
+                    "name": "System Administrator",
+                    "code": "SYSTEM_ADMINISTRATOR",
+                    "tenantId": "mz"
+                },
+                {
+                    "name": "Campaign Manager",
+                    "code": "CAMPAIGN_MANAGER",
+                    "tenantId": "mz"
+                },
+                {
+                    "name": "Localisation admin",
+                    "code": "LOC_ADMIN",
+                    "tenantId": "mz"
+                },
+                {
+                    "name": "MDMS Admin",
+                    "code": "MDMS_ADMIN",
+                    "tenantId": "mz"
+                }
+            ],
+            "active": true,
+            "tenantId": "",
+            "permanentCity": "Amritsar"
+        },
+        "msgId": "1716457221446|en_MZ",
+        "plainAccessRequest": {}
+    }
+}

@@ -1,0 +1,50 @@
+{
+    "ResourceDetails": {
+        "tenantId": "",
+        "fileStoreId": "",
+        "hierarchyType": "",
+        "additionalDetails": {},
+        "action": "create"
+    },
+    "RequestInfo": {
+        "apiId": "Rainmaker",
+        "authToken": "",
+        "userInfo": {
+            "id": 1052,
+            "uuid": "8b110055-330f-4e7b-b4c0-f618f29b9d47",
+            "userName": "UATMZ",
+            "name": "UATMZ",
+            "mobileNumber": "8998988112",
+            "emailId": null,
+            "locale": null,
+            "type": "EMPLOYEE",
+            "roles": [
+                {
+                    "name": "System Administrator",
+                    "code": "SYSTEM_ADMINISTRATOR",
+                    "tenantId": "dev"
+                },
+                {
+                    "name": "Campaign Managers",
+                    "code": "CAMPAIGN_MANAGER",
+                    "tenantId": "dev"
+                },
+                {
+                    "name": "Localisation admin",
+                    "code": "LOC_ADMIN",
+                    "tenantId": "dev"
+                },
+                {
+                    "name": "MDMS ADMIN",
+                    "code": "MDMS_ADMIN",
+                    "tenantId": "dev"
+                }
+            ],
+            "active": true,
+            "tenantId": "",
+            "permanentCity": null
+        },
+        "msgId": "1734414441211|en_MZ",
+        "plainAccessRequest": {}
+    }
+}
