@@ -1,0 +1,123 @@
+from utils.api_client import APIClient
+from utils.auth import get_auth_token
+from utils.config import tenantId
+import os
+import requests
+
+
+def upload_file(token, client, file_path, module="HCM-ADMIN-CONSOLE"):
+    """
+    Helper function to upload a file to filestore
+    Returns: file_store_id, status_code
+    """
+    # Check if file exists
+    if not os.path.exists(file_path):
+        print(f"File not found: {file_path}")
+        return None, 404
+
+    # Prepare multipart form data
+    files = {
+        'file': open(file_path, 'rb')
+    }
+    data = {
+        'tenantId': tenantId,
+        'module': module
+    }
+
+    # Make direct request since APIClient doesn't support multipart
+    from utils.config import BASE_URL
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = requests.post(
+        f"{BASE_URL}/filestore/v1/files",
+        files=files,
+        data=data,
+        headers=headers,
+        verify=False
+    )
+
+    files['file'].close()
+
+    if response.status_code not in [200, 201]:
+        print(f"Error uploading file: {response.text}")
+        return None, response.status_code
+
+    data = response.json()
+    file_store_id = data.get("files", [])[0].get("fileStoreId") if data.get("files") else None
+
+    return file_store_id, response.status_code
+
+
+def download_file_url(token, client, file_store_id):
+    """
+    Helper function to get file download URL
+    Returns: response object
+    """
+    # Make API call with query parameters
+    url = f"/filestore/v1/files/url?tenantId={tenantId}&fileStoreIds={file_store_id}"
+    response = client.get(url)
+
+    return response
+
+
+def test_upload_file():
+    """Test uploading a file to filestore"""
+    token = get_auth_token("user")
+    client = APIClient(token=token)
+
+    # You need to provide a valid file path for testing
+    # This is just a placeholder - update with actual file path
+    test_file_path = "/home/shreya-kumar/Downloads/sample_boundary.xlsx"
+
+    if not os.path.exists(test_file_path):
+        print(f"Skipping file upload test: File not found at {test_file_path}")
+        print("Please update the file path in the test or place a test file at the specified location")
+        return
+
+    file_store_id, status = upload_file(token, client, test_file_path)
+
+    assert status in [200, 201], f"File upload failed: {status}"
+    assert file_store_id is not None, "FileStore ID not returned"
+
+    print(f"File uploaded successfully. FileStore ID: {file_store_id}")
+
+    # Store for later use
+    with open("output/ids.txt", "a") as f:
+        f.write(f"Uploaded FileStore ID: {file_store_id}\n")
+
+
+def test_download_file_url():
+    """Test getting download URL for a file"""
+    token = get_auth_token("user")
+    client = APIClient(token=token)
+
+    # Read the file store ID from file
+    try:
+        file_store_id = None
+
+        with open("output/ids.txt", "r") as f:
+            for line in f:
+                if line.startswith("FileStore ID:") or line.startswith("Uploaded FileStore ID:"):
+                    file_store_id = line.split(":", 1)[1].strip()
+                    break
+
+        if not file_store_id:
+            print("Skipping test: No FileStore ID found. Upload a file first.")
+            return
+
+        response = download_file_url(token, client, file_store_id)
+
+        assert response.status_code == 200, f"File URL retrieval failed: {response.text}"
+
+        data = response.json()
+        file_store_ids = data.get("fileStoreIds", [])
+
+        if len(file_store_ids) > 0:
+            download_url = file_store_ids[0].get("url")
+            print(f"Download URL retrieved successfully")
+            print(f"URL: {download_url[:100]}..." if len(download_url) > 100 else f"URL: {download_url}")
+        else:
+            print("No file URLs found in response")
+
+    except FileNotFoundError:
+        print("No ids.txt file found. Run previous tests first.")

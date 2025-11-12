@@ -1,0 +1,14 @@
+{
+    "RequestInfo": {
+        "apiId": "Rainmaker",
+        "authToken": "",
+        "msgId": "1707298815359|en_MZ",
+        "plainAccessRequest": {}
+    },
+    "BoundaryTypeHierarchySearchCriteria": {
+        "tenantId": "",
+        "limit": 10,
+        "offset": 0,
+        "hierarchyType": ""
+    }
+}

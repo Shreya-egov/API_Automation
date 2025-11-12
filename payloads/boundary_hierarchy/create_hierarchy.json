@@ -1,0 +1,84 @@
+{
+    "RequestInfo": {
+        "apiId": "Rainmaker",
+        "authToken": "",
+        "userInfo": {
+            "id": 6152,
+            "uuid": "63a21269-d40d-4c26-878f-4f4486b1f44b",
+            "userName": "MDMSMZ",
+            "name": "MDMSMZ",
+            "mobileNumber": "8998989222",
+            "emailId": null,
+            "locale": null,
+            "type": "EMPLOYEE",
+            "roles": [
+                {
+                    "name": "System Administrator",
+                    "code": "SYSTEM_ADMINISTRATOR",
+                    "tenantId": "mz"
+                },
+                {
+                    "name": "Campaign Manager",
+                    "code": "CAMPAIGN_MANAGER",
+                    "tenantId": "mz"
+                },
+                {
+                    "name": "Localisation admin",
+                    "code": "LOC_ADMIN",
+                    "tenantId": "mz"
+                },
+                {
+                    "name": "MDMS Admin",
+                    "code": "MDMS_ADMIN",
+                    "tenantId": "mz"
+                }
+            ],
+            "active": true,
+            "tenantId": "mz",
+            "permanentCity": null
+        },
+        "msgId": "1695889012604|en_MZ",
+        "plainAccessRequest": {}
+    },
+    "BoundaryHierarchy": {
+        "tenantId": "",
+        "hierarchyType": "",
+        "boundaryHierarchy": [
+            {
+                "boundaryType": "Country",
+                "parentBoundaryType": null,
+                "active": true
+            },
+            {
+                "boundaryType": "PROVINCE",
+                "parentBoundaryType": "Country",
+                "active": true
+            },
+            {
+                "boundaryType": "DISTRICT",
+                "parentBoundaryType": "PROVINCE",
+                "active": true
+            },
+            {
+                "boundaryType": "POST ADMINISTRATIVE",
+                "parentBoundaryType": "DISTRICT",
+                "active": true
+            },
+            {
+                "boundaryType": "LOCALITY",
+                "parentBoundaryType": "POST ADMINISTRATIVE",
+                "active": true
+            },
+            {
+                "boundaryType": "HEALTH FACILITY",
+                "parentBoundaryType": "LOCALITY",
+                "active": true
+            },
+            {
+                "boundaryType": "VILLAGE",
+                "parentBoundaryType": "HEALTH FACILITY",
+                "active": true
+            }
+        ]
+    }
+}
