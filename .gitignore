@@ -22,12 +22,18 @@ output/*.txt
 output/*.json
 output/*.xlsx
 output/*.csv
+output/.~lock.*
 !output/.gitkeep
 
 # Reports
 reports/*.html
 reports/*.xml
 !reports/.gitkeep
+
+# Allure
+allure-results/
+allure-report/
+.allure/
 
 # IDE
 .vscode/
