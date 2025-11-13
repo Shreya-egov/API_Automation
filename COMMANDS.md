@@ -33,12 +33,11 @@ run_tests.bat
 
 ```bash
 pytest tests/ --alluredir=allure-results --clean-alluredir -v && \
-cp categories.json allure-results/ && \
 allure generate allure-results --clean -o allure-report && \
-cd allure-report && python3 -m http.server 8000
+cd allure-report && python3 -m http.server 8080
 ```
 
-Then open: **http://localhost:8000**
+Then open: **http://localhost:8080**
 
 ---
 
@@ -61,17 +60,18 @@ allure generate allure-results --clean -o allure-report
 
 ### **Step 4: View Report**
 
-**Method A - Using Allure Server:**
+**Method A - Using Python HTTP Server (Recommended):**
+```bash
+cd allure-report
+python3 -m http.server 8080
+```
+Then open: **http://localhost:8080**
+
+**Method B - Using Allure Server:**
 ```bash
 allure open allure-report
 ```
-
-**Method B - Using Python HTTP Server:**
-```bash
-cd allure-report
-python3 -m http.server 8000
-```
-Then open: http://localhost:8000
+*Note: If this fails with Java errors, use Method A*
 
 ---
 
@@ -161,16 +161,28 @@ allure generate allure-results --clean -o allure-report
 allure generate allure-results -o allure-report
 ```
 
-### **Serve Report with Allure**
+### **Serve Report with Python HTTP Server (Recommended)**
+```bash
+# Generate report first
+allure generate allure-results --clean -o allure-report
+
+# Start HTTP server
+cd allure-report
+python3 -m http.server 8080
+```
+Then open: **http://localhost:8080**
+
+### **Serve Report with Allure (Alternative)**
 ```bash
 allure serve allure-results
 ```
-*This generates and serves the report in one command*
+*Note: This generates and serves the report in one command, but may fail with Java errors. Use Python HTTP server if issues occur.*
 
 ### **Open Existing Report**
 ```bash
 allure open allure-report
 ```
+*Note: May not work on all systems. Use Python HTTP server as alternative.*
 
 ---
 
@@ -211,11 +223,13 @@ rm -rf allure-results/ allure-report/ output/ids.txt
 ### **Stop HTTP Server**
 
 ```bash
-# Kill server on port 8000
-pkill -f "python3 -m http.server 8000"
+# Kill server (replace 8080 with your port)
+pkill -f "python3 -m http.server 8080"
 
-# Alternative method
-lsof -ti:8000 | xargs kill -9
+# Alternative method - stop by port
+lsof -ti:8080 | xargs kill -9
+
+# Or press Ctrl+C in the terminal where server is running
 ```
 
 ---
@@ -225,14 +239,12 @@ lsof -ti:8000 | xargs kill -9
 ### **CI Pipeline Command (No Browser)**
 ```bash
 pytest tests/ --alluredir=allure-results --clean-alluredir -v && \
-cp categories.json allure-results/ && \
 allure generate allure-results --clean -o allure-report
 ```
 
 ### **CI with HTML Report Archive**
 ```bash
 pytest tests/ --alluredir=allure-results --clean-alluredir -v && \
-cp categories.json allure-results/ && \
 allure generate allure-results --clean -o allure-report && \
 tar -czf allure-report.tar.gz allure-report/
 ```
@@ -274,7 +286,7 @@ Add to your `~/.bashrc` or `~/.zshrc`:
 alias run-tests='cd /path/to/API_Automation && ./run_tests.sh'
 
 # Quick test with report
-alias test-report='pytest tests/ --alluredir=allure-results --clean-alluredir -v && cp categories.json allure-results/ && allure generate allure-results --clean -o allure-report && allure open allure-report'
+alias test-report='pytest tests/ --alluredir=allure-results --clean-alluredir -v && allure generate allure-results --clean -o allure-report && cd allure-report && python3 -m http.server 8080'
 ```
 
 ### **Watch Mode (Re-run on File Change)**
@@ -298,11 +310,11 @@ ptw tests/ -- --alluredir=allure-results -v
 | **Run all tests (automated)** | `./run_tests.sh` |
 | **Run all tests (manual)** | `pytest tests/ --alluredir=allure-results -v` |
 | **Generate report** | `allure generate allure-results --clean -o allure-report` |
-| **Open report** | `allure open allure-report` |
-| **Serve report** | `cd allure-report && python3 -m http.server 8000` |
+| **Serve report** | `cd allure-report && python3 -m http.server 8080` |
+| **Complete flow (one-liner)** | `pytest tests/ --alluredir=allure-results --clean-alluredir -v && allure generate allure-results --clean -o allure-report && cd allure-report && python3 -m http.server 8080` |
 | **View latest hierarchy** | `grep "Hierarchy Type:" output/ids.txt \| tail -1` |
 | **Clean results** | `rm -rf allure-results/ allure-report/` |
-| **Stop server** | `pkill -f "python3 -m http.server 8000"` |
+| **Stop server** | `pkill -f "python3 -m http.server 8080"` |
 
 ---
 

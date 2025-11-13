@@ -275,41 +275,47 @@ pytest tests/ --alluredir=allure-results -v --durations=10
 
 ### Generate and View Reports
 
-#### Method 1: Using Allure Server (Recommended)
+#### Method 1: Using Python HTTP Server (Recommended)
 
-```bash
-# Step 1: Copy categories configuration
-cp categories.json allure-results/
-
-# Step 2: Generate report
-allure generate allure-results --clean -o allure-report
-
-# Step 3: Open in browser
-allure open allure-report
-```
-
-#### Method 2: Using Python HTTP Server
+This method is the most reliable and works across all environments:
 
 ```bash
 # Step 1: Generate report
-cp categories.json allure-results/
 allure generate allure-results --clean -o allure-report
 
-# Step 2: Start HTTP server
+# Step 2: Start HTTP server (choose a port)
 cd allure-report
-python3 -m http.server 8000
+python3 -m http.server 8080
 
-# Step 3: Open browser to http://localhost:8000
+# Step 3: Open browser to http://localhost:8080
 ```
 
-#### One-Liner (Complete Flow)
+**Note:** The server runs in the background. To stop it, press `Ctrl+C` or use:
+```bash
+pkill -f "python3 -m http.server 8080"
+```
+
+#### Method 2: One-Liner (Complete Flow)
+
+Run tests and serve report in one command:
 
 ```bash
 pytest tests/ --alluredir=allure-results --clean-alluredir -v && \
-cp categories.json allure-results/ && \
 allure generate allure-results --clean -o allure-report && \
-cd allure-report && python3 -m http.server 8000
+cd allure-report && python3 -m http.server 8080
 ```
+
+Then open: **http://localhost:8080**
+
+#### Method 3: Using Allure Server (Alternative)
+
+```bash
+# Generate and open report (may not work on all systems)
+allure generate allure-results --clean -o allure-report
+allure open allure-report
+```
+
+**Note:** If `allure serve` or `allure open` fails with Java errors, use Method 1 (Python HTTP Server) instead.
 
 ### Report Features
 
