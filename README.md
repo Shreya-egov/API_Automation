@@ -144,36 +144,36 @@ mkdir -p output
 
 ## ⚙️ Configuration
 
-### 1. Update Configuration File
+### 1. Create Environment File
 
-Edit `utils/config.py` to set your environment:
+Create a `.env` file in the `utils/` directory with your configuration:
 
-```python
-# Base URL for API endpoints
-BASE_URL = "https://unified-qa.digit.org"
+```bash
+# API Configuration
+BASE_URL=https://unified-qa.digit.org
 
-# Tenant ID
-tenantId = "pg.citya"
+# Authentication
+USERNAME=SATYA
+PASSWORD=eGov@1234
+USERTYPE=EMPLOYEE
+CLIENT_AUTH_HEADER=Basic ZWdvdi11c2VyLWNsaWVudDo=
 
-# Authentication URLs
-AUTH_URL = "https://unified-qa.digit.org/user/oauth/token"
-USER_LOGIN_URL = "https://unified-qa.digit.org/user/v1/_details"
+# Tenant Configuration
+TENANTID=mz
+
+# Search Parameters (Optional)
+SEARCH_LIMIT=100
+SEARCH_OFFSET=0
+
+# Test Data (Optional)
+HIERARCHYTYPE=
+BOUNDARY_CODE=
+BOUNDARY_TYPE=
 ```
 
-### 2. Update Credentials
+**Note:** Update the `USERNAME` and `PASSWORD` with your actual credentials.
 
-Edit `utils/auth.py` to set your test user credentials:
-
-```python
-TEST_USERS = {
-    "user": {
-        "username": "YOUR_USERNAME",
-        "password": "YOUR_PASSWORD"
-    }
-}
-```
-
-### 3. Verify Test Data
+### 2. Verify Test Data
 
 Test payloads are stored in `test_data/` directory. Review and update as needed:
 - `boundary_hierarchy/` - Hierarchy creation and search payloads
