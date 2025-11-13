@@ -35,6 +35,10 @@ allure-results/
 allure-report/
 .allure/
 
+# Logs
+logs/*.log
+!logs/.gitkeep
+
 # IDE
 .vscode/
 .idea/

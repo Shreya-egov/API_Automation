@@ -3,9 +3,13 @@ from utils.auth import get_auth_token
 from utils.data_loader import load_payload
 from utils.request_info import get_request_info
 from utils.config import tenantId
+from utils.logger import setup_logger, log_test_start, log_test_end
 import uuid
 import allure
 import json
+
+# Set up logger
+logger = setup_logger(__name__)
 
 
 def create_boundary_hierarchy(token, client, hierarchy_type):
@@ -71,21 +75,28 @@ def search_boundary_hierarchy(token, client, hierarchy_type):
 @allure.description("Creates a new boundary hierarchy with a unique hierarchy type and validates the creation")
 def test_create_boundary_hierarchy():
     """Test creating a boundary hierarchy"""
+    log_test_start(logger, "test_create_boundary_hierarchy")
+
     token = get_auth_token("user")
     client = APIClient(token=token)
 
     # Generate unique hierarchy type
     hierarchy_type = f"TEST_{uuid.uuid4().hex[:8].upper()}"
+    logger.info(f"Generated hierarchy type: {hierarchy_type}")
 
     created_type, status = create_boundary_hierarchy(token, client, hierarchy_type)
 
     assert status in [200, 202], f"Hierarchy creation failed: {status}"
     assert created_type == hierarchy_type, f"Expected {hierarchy_type}, got {created_type}"
+
+    logger.info(f"Boundary hierarchy created successfully: {created_type}")
     print(f"Boundary hierarchy created: {created_type}")
 
     # Store for later use
     with open("output/ids.txt", "a") as f:
         f.write(f"Hierarchy Type: {created_type}\n")
+
+    log_test_end(logger, "test_create_boundary_hierarchy", "PASSED")
 
 
 @allure.feature("Boundary Hierarchy")
@@ -95,6 +106,8 @@ def test_create_boundary_hierarchy():
 @allure.description("Searches for an existing boundary hierarchy and validates the search results")
 def test_search_boundary_hierarchy():
     """Test searching for a boundary hierarchy"""
+    log_test_start(logger, "test_search_boundary_hierarchy")
+
     token = get_auth_token("user")
     client = APIClient(token=token)
 
@@ -106,6 +119,7 @@ def test_search_boundary_hierarchy():
                     hierarchy_type = line.split(":")[1].strip()
                     break
 
+        logger.info(f"Searching for hierarchy type: {hierarchy_type}")
         response = search_boundary_hierarchy(token, client, hierarchy_type)
 
         assert response.status_code == 200, f"Hierarchy search failed: {response.text}"
@@ -116,9 +130,15 @@ def test_search_boundary_hierarchy():
         assert len(hierarchies) > 0, "No hierarchies found in response"
         assert hierarchies[0]["hierarchyType"] == hierarchy_type, f"Expected {hierarchy_type}"
 
+        logger.info(f"Hierarchy found: {hierarchies[0]['hierarchyType']}")
+        logger.info(f"Number of boundary types: {len(hierarchies[0].get('boundaryHierarchy', []))}")
         print(f"Hierarchy found: {hierarchies[0]['hierarchyType']}")
         print(f"Number of boundary types: {len(hierarchies[0].get('boundaryHierarchy', []))}")
 
+        log_test_end(logger, "test_search_boundary_hierarchy", "PASSED")
+
     except FileNotFoundError:
+        logger.error("Hierarchy Type not found in ids.txt")
         print("No hierarchy type found. Run create test first.")
+        log_test_end(logger, "test_search_boundary_hierarchy", "FAILED")
         assert False, "Hierarchy Type not found in ids.txt"
