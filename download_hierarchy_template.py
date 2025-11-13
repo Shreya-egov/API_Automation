@@ -17,7 +17,7 @@ import os
 import re
 
 
-def fill_template_with_sample(template_file, hierarchy_type, sample_file="/home/shreya-kumar/Downloads/sample/sample.xlsx"):
+def fill_template_with_sample(template_file, hierarchy_type, sample_file="sample/sample.xlsx"):
     """
     Fill the downloaded template with data from sample file
     Replaces any existing hierarchy type codes with the new hierarchy type

@@ -39,7 +39,7 @@ def fill_template_with_sample(template_file, hierarchy_type, sample_file):
 
 ## Sample File Location
 
-**Default Sample File:** `/home/shreya-kumar/Downloads/sample/sample.xlsx`
+**Default Sample File:** `sample/sample.xlsx` (in the repository)
 
 The script automatically looks for this file. If not found, it skips auto-fill and you can manually fill the template.
 
@@ -89,7 +89,7 @@ Step 6: Auto-filling template with sample data...
   ✓ Updated worksheet data
 ✓ Template auto-filled successfully!
   Filled file: output/hierarchy_template_TEST_69089BE7_filled.xlsx
-  Sample file used: /home/shreya-kumar/Downloads/sample/sample.xlsx
+  Sample file used: sample/sample.xlsx
 
 ================================================================================
 NEXT STEPS:
@@ -139,7 +139,7 @@ All boundary data from the sample file is preserved:
 
 If the sample file is not found:
 ```
-⚠ Sample file not found at: /home/shreya-kumar/Downloads/sample/sample.xlsx
+⚠ Sample file not found at: sample/sample.xlsx
 ⚠ Skipping auto-fill. You can manually fill the template.
 ```
 
@@ -153,7 +153,7 @@ To use a different sample file, modify the default parameter:
 def fill_template_with_sample(
     template_file,
     hierarchy_type,
-    sample_file="/path/to/your/sample.xlsx"  # Change this
+    sample_file="sample/sample.xlsx"  # Change this path if needed
 ):
 ```
 
