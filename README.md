@@ -10,6 +10,7 @@ Comprehensive API automation testing framework for Boundary Management services 
 
 - [Overview](#overview)
 - [Features](#features)
+  - [Template Auto-Fill Feature](#template-auto-fill-feature-)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Configuration](#configuration)
@@ -18,6 +19,8 @@ Comprehensive API automation testing framework for Boundary Management services 
 - [Project Structure](#project-structure)
 - [Test Coverage](#test-coverage)
 - [Advanced Usage](#advanced-usage)
+  - [Template Download and Auto-Fill](#template-download-and-auto-fill)
+  - [Status Polling Configuration](#status-polling-configuration)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 
@@ -36,6 +39,7 @@ This framework automates testing for Boundary Management APIs including:
 - ✅ Modular and maintainable test structure
 - ✅ Data-driven testing with JSON payloads
 - ✅ Automatic test dependency management
+- ✅ Template auto-fill with sample data for quick testing
 
 ## 🚀 Features
 
@@ -57,6 +61,15 @@ This framework automates testing for Boundary Management APIs including:
 - **Reusable Components:** Shared utilities for auth, config, and data loading
 - **Environment Management:** Easy configuration switching
 - **Clean Code:** Well-documented and maintainable
+
+### Template Auto-Fill Feature ⭐
+- **Automated Template Download:** Download boundary hierarchy templates via API
+- **Smart Data Filling:** Automatically fills templates with sample boundary data
+- **Code Replacement:** Intelligently replaces hierarchy type codes with current test data
+- **Sample File Included:** Pre-configured sample file with multi-level boundary hierarchies
+- **Seamless Integration:** Ready-to-upload files for testing
+
+Learn more: [AUTO_FILL_FEATURE.md](AUTO_FILL_FEATURE.md)
 
 ## 📦 Prerequisites
 
@@ -350,8 +363,12 @@ API_Automation/
 │   │   └── process_search.json
 │   └── ...
 │
+├── sample/                                   # Sample data files
+│   └── sample.xlsx                          # Sample boundary data for auto-fill
+│
 ├── output/                                   # Test execution output
-│   └── ids.txt                              # Generated IDs and hierarchy types
+│   ├── ids.txt                              # Generated IDs and hierarchy types
+│   └── hierarchy_template_*_filled.xlsx     # Auto-filled templates
 │
 ├── allure-results/                          # Allure test results (generated)
 ├── allure-report/                           # Allure HTML report (generated)
@@ -396,6 +413,34 @@ API_Automation/
 **Total: 14 automated test scenarios**
 
 ## 🔬 Advanced Usage
+
+### Template Download and Auto-Fill
+
+The framework includes a powerful template download and auto-fill utility:
+
+```bash
+# Download template and auto-fill with sample data
+python3 download_hierarchy_template.py
+```
+
+**What it does:**
+1. Downloads the boundary hierarchy template from the API
+2. Automatically fills it with data from `sample/sample.xlsx`
+3. Replaces hierarchy type codes (e.g., TETE5_) with your current test hierarchy type
+4. Saves a ready-to-upload filled template in `output/`
+
+**Sample Data Included:**
+- Multi-level hierarchies (Country → Province → District → Villages)
+- Post Administrative levels and Health Facilities
+- Service Boundary Codes
+- Multi-language support (English, French, Portuguese)
+- Latitude/Longitude coordinates
+
+**Output Files:**
+- `output/hierarchy_template_{TYPE}.xlsx` - Original template
+- `output/hierarchy_template_{TYPE}_filled.xlsx` - Auto-filled and ready to use
+
+For complete details, see [AUTO_FILL_FEATURE.md](AUTO_FILL_FEATURE.md)
 
 ### Status Polling Configuration
 
@@ -548,4 +593,4 @@ For issues and questions:
 
 **Happy Testing! 🚀**
 
-*Last Updated: November 2025*
+*Last Updated: November 13, 2025*
