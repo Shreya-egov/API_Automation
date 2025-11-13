@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+from pathlib import Path
 from utils.config import tenantId
 import urllib3
 
@@ -8,7 +9,8 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load environment variables from .env file
-load_dotenv(override=True)  # This forces reloading of updated values
+env_path = Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=env_path, override=True)  # This forces reloading of updated values
 
 def get_auth_token(service: str):
     url = os.getenv("BASE_URL") + "/user/oauth/token"

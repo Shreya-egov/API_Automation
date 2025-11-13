@@ -4,6 +4,8 @@ from utils.data_loader import load_payload
 from utils.request_info import get_request_info
 from utils.config import tenantId
 import os
+import allure
+import json
 
 
 def upsert_localization(token, client, hierarchy_type, locale="en_MZ"):
@@ -34,13 +36,25 @@ def upsert_localization(token, client, hierarchy_type, locale="en_MZ"):
         },
         {
             "code": f"{hierarchy_type}_DISTRICT",
-            "message": "District",
+            "message": "Distrito",
+            "module": f"hcm-boundary-{hierarchy_type_lower}",
+            "locale": locale
+        },
+        {
+            "code": f"{hierarchy_type}_POST ADMINISTRATIVE",
+            "message": "Post administrative",
             "module": f"hcm-boundary-{hierarchy_type_lower}",
             "locale": locale
         },
         {
             "code": f"{hierarchy_type}_LOCALITY",
             "message": "Locality",
+            "module": f"hcm-boundary-{hierarchy_type_lower}",
+            "locale": locale
+        },
+        {
+            "code": f"{hierarchy_type}_HEALTH FACILITY",
+            "message": "Health Facility",
             "module": f"hcm-boundary-{hierarchy_type_lower}",
             "locale": locale
         },

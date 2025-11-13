@@ -4,6 +4,8 @@ from utils.data_loader import load_payload
 from utils.request_info import get_request_info
 from utils.config import tenantId
 import uuid
+import allure
+import json
 
 
 def create_boundary_hierarchy(token, client, hierarchy_type):
@@ -18,8 +20,13 @@ def create_boundary_hierarchy(token, client, hierarchy_type):
     payload["BoundaryHierarchy"]["tenantId"] = tenantId
     payload["BoundaryHierarchy"]["hierarchyType"] = hierarchy_type
 
+    allure.attach(json.dumps(payload, indent=2), name="Create Hierarchy Request", attachment_type=allure.attachment_type.JSON)
+
     # Make API call
     response = client.post("/boundary-service/boundary-hierarchy-definition/_create", payload)
+
+    allure.attach(f"Status Code: {response.status_code}", name="Create Hierarchy Response Status", attachment_type=allure.attachment_type.TEXT)
+    allure.attach(json.dumps(response.json(), indent=2) if response.text else "No response body", name="Create Hierarchy Response Body", attachment_type=allure.attachment_type.JSON)
 
     if response.status_code not in [200, 202]:
         print(f"Error creating hierarchy: {response.text}")
@@ -43,15 +50,25 @@ def search_boundary_hierarchy(token, client, hierarchy_type):
     payload["BoundaryTypeHierarchySearchCriteria"]["tenantId"] = tenantId
     payload["BoundaryTypeHierarchySearchCriteria"]["hierarchyType"] = hierarchy_type
 
+    allure.attach(json.dumps(payload, indent=2), name="Search Hierarchy Request", attachment_type=allure.attachment_type.JSON)
+
     # Make API call with query parameters
     response = client.post(
         "/boundary-service/boundary-hierarchy-definition/_search?limit=10&offset=0",
         payload
     )
 
+    allure.attach(f"Status Code: {response.status_code}", name="Search Hierarchy Response Status", attachment_type=allure.attachment_type.TEXT)
+    allure.attach(json.dumps(response.json(), indent=2) if response.text else "No response body", name="Search Hierarchy Response Body", attachment_type=allure.attachment_type.JSON)
+
     return response
 
 
+@allure.feature("Boundary Hierarchy")
+@allure.story("Create Hierarchy")
+@allure.severity(allure.severity_level.BLOCKER)
+@allure.title("Test Create Boundary Hierarchy")
+@allure.description("Creates a new boundary hierarchy with a unique hierarchy type and validates the creation")
 def test_create_boundary_hierarchy():
     """Test creating a boundary hierarchy"""
     token = get_auth_token("user")
@@ -71,6 +88,11 @@ def test_create_boundary_hierarchy():
         f.write(f"Hierarchy Type: {created_type}\n")
 
 
+@allure.feature("Boundary Hierarchy")
+@allure.story("Search Hierarchy")
+@allure.severity(allure.severity_level.CRITICAL)
+@allure.title("Test Search Boundary Hierarchy")
+@allure.description("Searches for an existing boundary hierarchy and validates the search results")
 def test_search_boundary_hierarchy():
     """Test searching for a boundary hierarchy"""
     token = get_auth_token("user")

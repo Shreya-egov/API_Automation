@@ -1,7 +1,10 @@
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv(override=True)  # This forces reloading of updated values
+# Load .env from utils directory
+env_path = Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=env_path, override=True)  # This forces reloading of updated values
 
 BASE_URL = os.getenv("BASE_URL")
 tenantId = os.getenv("TENANTID", "mz")
@@ -22,7 +25,3 @@ search_params = {
     "offset": search_offset,
     "tenantId": tenantId
 }
-
-individual=os.getenv("SERVICE_INDIVIDUAL")
-project=os.getenv("SERVICE_PROJECT")
-mdms=os.getenv("SERVICE_MDMS")
