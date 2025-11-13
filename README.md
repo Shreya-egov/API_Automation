@@ -168,7 +168,30 @@ Test payloads are stored in `test_data/` directory. Review and update as needed:
 
 ## 🏃 Running Tests
 
-### Quick Start
+### Quick Start (Automated Script)
+
+**Linux/Mac:**
+```bash
+# Make script executable (first time only)
+chmod +x run_tests.sh
+
+# Run complete test suite
+./run_tests.sh
+```
+
+**Windows:**
+```cmd
+run_tests.bat
+```
+
+The script automatically:
+- Cleans previous results
+- Runs all tests
+- Generates Allure report
+- Starts HTTP server
+- Opens report in browser
+
+### Quick Start (Manual)
 
 ```bash
 # Run all tests with Allure results
@@ -178,6 +201,8 @@ pytest tests/ --alluredir=allure-results -v
 allure generate allure-results --clean -o allure-report
 allure open allure-report
 ```
+
+**💡 For complete command reference, see [COMMANDS.md](COMMANDS.md)**
 
 ### Basic Commands
 
@@ -334,7 +359,12 @@ API_Automation/
 ├── categories.json                          # Allure failure categories
 ├── pytest.ini                               # Pytest configuration
 ├── requirements.txt                         # Python dependencies
-└── README.md                                # This file
+├── README.md                                # This file
+├── COMMANDS.md                              # Quick command reference
+├── run_tests.sh                             # Test execution script (Linux/Mac)
+├── run_tests.bat                            # Test execution script (Windows)
+├── download_hierarchy_template.py           # Template download utility
+└── AUTO_FILL_FEATURE.md                     # Auto-fill feature documentation
 ```
 
 ## 🧪 Test Coverage
