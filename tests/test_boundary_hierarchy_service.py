@@ -92,8 +92,8 @@ def test_create_boundary_hierarchy():
     logger.info(f"Boundary hierarchy created successfully: {created_type}")
     print(f"Boundary hierarchy created: {created_type}")
 
-    # Store for later use
-    with open("output/ids.txt", "a") as f:
+    # Store for later use (overwrite to keep only the latest)
+    with open("output/ids.txt", "w") as f:
         f.write(f"Hierarchy Type: {created_type}\n")
 
     log_test_end(logger, "test_create_boundary_hierarchy", "PASSED")
