@@ -313,16 +313,16 @@ def test_process_boundary_data():
         with open("output/ids.txt", "r") as f:
             lines = f.readlines()
 
-        # Parse backwards to find the most recent hierarchy type and its corresponding FileStore ID
+        # Parse backwards to find the most recent hierarchy type and its corresponding Uploaded FileStore ID
         for i in range(len(lines) - 1, -1, -1):
             line = lines[i]
             if line.startswith("Hierarchy Type:") and not found_hierarchy:
                 hierarchy_type = line.split(":")[1].strip()
                 found_hierarchy = True
-                # Now look forward from this point to find the associated FileStore ID (not Uploaded)
+                # Now look forward from this point to find the associated Uploaded FileStore ID (the filled template)
                 for j in range(i + 1, len(lines)):
-                    if lines[j].startswith("FileStore ID:") and not lines[j].startswith("Uploaded FileStore ID:"):
-                        file_store_id = lines[j].split(":")[1].strip()
+                    if lines[j].startswith("Uploaded FileStore ID:"):
+                        file_store_id = lines[j].split(":", 1)[1].strip()
                         break
                     elif lines[j].startswith("Hierarchy Type:"):
                         # Hit another hierarchy type, stop searching
@@ -334,13 +334,13 @@ def test_process_boundary_data():
             return
 
         if not file_store_id:
-            print("Skipping test: No FileStore ID from generate search found.")
-            print("This test requires a completed boundary generation that produces a template file.")
-            print("Run the generate and search tests first and ensure generation completes successfully.")
+            print("Skipping test: No Uploaded FileStore ID found.")
+            print("This test requires the filled template to be uploaded first.")
+            print("Run test_upload_file to upload the filled boundary template.")
             return
 
         print(f"Processing boundary data for hierarchy: {hierarchy_type}")
-        print(f"Using FileStore ID: {file_store_id}")
+        print(f"Using Uploaded FileStore ID (filled template): {file_store_id}")
 
         process_id, status = process_boundary_data(token, client, file_store_id, hierarchy_type)
 

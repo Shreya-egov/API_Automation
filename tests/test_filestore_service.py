@@ -5,6 +5,7 @@ import os
 import requests
 import allure
 import json
+import subprocess
 
 
 def upload_file(token, client, file_path, module="HCM-ADMIN-CONSOLE"):
@@ -87,16 +88,43 @@ def test_upload_file():
             print("Please run test_create_boundary_hierarchy first")
             return
 
-        # Look for the filled template file
+        # Always ensure we have the filled template
         test_file_path = f"output/hierarchy_template_{hierarchy_type}_filled.xlsx"
 
-        if not os.path.exists(test_file_path):
-            print(f"Skipping file upload test: Filled template not found at {test_file_path}")
-            print("Please run: python download_hierarchy_template.py")
-            print("This will download and auto-fill the template with sample data")
-            return
+        print(f"Ensuring filled template exists for: {hierarchy_type}")
 
-        print(f"Found filled template: {test_file_path}")
+        # Run the download_hierarchy_template.py script
+        result = subprocess.run(
+            ["python3", "download_hierarchy_template.py"],
+            capture_output=True,
+            text=True,
+            timeout=180
+        )
+
+        if result.returncode != 0:
+            print(f"Error generating template:")
+            print(f"STDOUT: {result.stdout}")
+            print(f"STDERR: {result.stderr}")
+            assert False, "Failed to generate template automatically"
+
+        # Check if the output indicates success
+        if "SUCCESS!" in result.stdout or "Template downloaded successfully" in result.stdout:
+            print("✓ Template ready")
+        elif "Template generation in progress" in result.stdout:
+            print("⚠ Template generation is still in progress on the server")
+            print("Waiting may be required for very new hierarchies")
+            # Still check if file exists - may be from previous run
+            if not os.path.exists(test_file_path):
+                print("Template not available yet - will be ready in next run")
+                return  # Skip gracefully
+
+        # Verify the file exists
+        if not os.path.exists(test_file_path):
+            print(f"Template file not found at: {test_file_path}")
+            print(f"Script output: {result.stdout[-1000:]}")  # Last 1000 chars
+            assert False, f"Template file not available: {test_file_path}"
+
+        print(f"Using filled template: {test_file_path}")
 
     except FileNotFoundError:
         print("No ids.txt file found. Please run boundary hierarchy tests first.")

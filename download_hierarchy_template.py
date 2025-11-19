@@ -137,15 +137,19 @@ def generate_and_download_template(hierarchy_type):
         print(f"✗ Generation failed: {response.text}")
         return None
 
-    # Step 3: Wait and search for generated template
-    print("Step 3: Waiting for template generation (checking every 3 seconds)...")
-    max_attempts = 20
-    attempt = 0
-    file_store_id = None
+    # Step 3: Search for generated template (keep retrying until fileStoreid is available)
+    print("Step 3: Searching for generated template...")
 
-    while attempt < max_attempts:
+    file_store_id = None
+    max_attempts = 30  # 30 attempts x 3 seconds = up to 90 seconds wait
+    attempt = 0
+
+    while attempt < max_attempts and not file_store_id:
         attempt += 1
-        time.sleep(3)
+
+        if attempt > 1:
+            print(f"  Waiting... (attempt {attempt}/{max_attempts})")
+            time.sleep(3)  # Wait 3 seconds between retries
 
         # Search for generated template
         search_payload = load_payload("boundary_management", "generate_search.json")
@@ -157,30 +161,30 @@ def generate_and_download_template(hierarchy_type):
 
         if search_response.status_code == 200:
             search_data = search_response.json()
-            resources = search_data.get("ResourceDetails", [])
+            resources = search_data.get("GeneratedResource", [])
 
             if resources:
                 latest_resource = resources[0]
-                file_store_id = latest_resource.get("fileStoreId")
+                file_store_id = latest_resource.get("fileStoreid")  # lowercase 'id'
                 status = latest_resource.get("status")
 
-                print(f"  Attempt {attempt}: Status = {status}")
-
                 if file_store_id:
-                    print(f"✓ Template generated successfully!")
+                    print(f"✓ Template found!")
+                    print(f"  Status = {status}")
                     print(f"  FileStore ID: {file_store_id}\n")
 
                     # Save fileStore ID
                     with open("output/ids.txt", "a") as f:
                         f.write(f"Template FileStore ID: {file_store_id}\n")
-                    break
-
-        if attempt == max_attempts:
-            print(f"✗ Template generation timeout after {max_attempts} attempts")
-            return None
+                    break  # Success - exit loop
+                else:
+                    # No fileStoreid yet, continue waiting
+                    if attempt == 1:
+                        print(f"  Template status: {status} (waiting for fileStoreid...)")
 
     if not file_store_id:
-        print("✗ No template file generated yet")
+        print(f"✗ Template generation timeout after {max_attempts} attempts")
+        print("  The template may still be generating. Please try again later.")
         return None
 
     # Step 4: Get download URL
