@@ -47,7 +47,8 @@ def prepare_template_for_upload(token):
     template_ws = template_wb['Boundary Data']
     sample_ws = sample_wb['Boundary Data']
 
-    # Copy data from sample (rows 2 onwards) to template
+    # Copy data from sample (rows 2 onwards only, skip headers)
+    # This preserves the downloaded template's headers in row 1
     data_rows = []
     for row in sample_ws.iter_rows(min_row=2, values_only=True):
         if any(cell for cell in row):
@@ -55,7 +56,7 @@ def prepare_template_for_upload(token):
 
     print(f"  Copying {len(data_rows)} data rows from sample to template...")
 
-    # Write data to template starting from row 2
+    # Write data to template starting from row 2 (row 1 headers are preserved)
     for row_idx, row_data in enumerate(data_rows, start=2):
         for col_idx, value in enumerate(row_data, start=1):
             template_ws.cell(row=row_idx, column=col_idx, value=value)
@@ -72,13 +73,12 @@ def test_file_upload():
 
     sample_file = "output/sample_boundary.xlsx"
 
-    # Auto-prepare template if it doesn't exist
-    if not os.path.exists(sample_file):
-        print("\nPreparing template for upload...")
-        try:
-            prepare_template_for_upload(token)
-        except Exception as e:
-            pytest.skip(f"Could not prepare template: {e}")
+    # Always prepare template to ensure it matches the current hierarchy
+    print("\nPreparing template for upload...")
+    try:
+        prepare_template_for_upload(token)
+    except Exception as e:
+        pytest.skip(f"Could not prepare template: {e}")
 
     # Prepare multipart form data
     files = {
