@@ -1,132 +1,83 @@
 # API Automation Framework
 
-A comprehensive Python-based API automation testing framework for microservices testing using pytest. This framework provides reusable utilities, dynamic payload management, and extensive reporting capabilities.
+A comprehensive Python-based API automation testing framework for boundary management and localization services using pytest.
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Project Structure](#project-structure)
-- [Architecture](#architecture)
 - [Prerequisites](#prerequisites)
 - [Setup and Installation](#setup-and-installation)
 - [Configuration](#configuration)
-- [Services Covered](#services-covered)
-- [Writing Tests](#writing-tests)
+- [Test Suite](#test-suite)
 - [Running Tests](#running-tests)
+- [Template Automation](#template-automation)
 - [Reporting](#reporting)
 - [Utilities Documentation](#utilities-documentation)
-- [Best Practices](#best-practices)
-- [Git Workflow](#git-workflow)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Overview
 
-This framework is designed to test multiple microservices with a focus on:
+This framework is designed to test boundary management and localization microservices with a focus on:
+- **Sequential Test Execution**: 15 tests covering complete boundary management workflow
+- **Template Automation**: Automated template download, data population, and upload
 - **Modularity**: Reusable utilities for authentication, API calls, and data management
 - **Maintainability**: Separation of test logic, payloads, and configuration
-- **Extensibility**: Easy addition of new services and test cases
 - **Reporting**: Multiple reporting formats (HTML, Allure)
-- **Configuration Management**: Environment-based configuration using `.env` files
 
 ---
 
 ## Project Structure
 
 ```
-api_automation_project/
-├── tests/                          # Test modules
-│   ├── test_individual_service.py
-│   ├── test_household_service.py
-│   ├── test_boundary_service.py
-│   ├── test_facility_service.py
-│   ├── test_product_service.py
-│   ├── test_project_service.py
-│   └── test_mdms_service.py
-├── utils/                          # Utility modules
-│   ├── api_client.py              # HTTP client wrapper
-│   ├── auth.py                    # Authentication token management
-│   ├── config.py                  # Configuration loader
-│   ├── data_loader.py             # Payload loader
-│   ├── request_info.py            # Request metadata builder
-│   └── search_helpers.py          # Common search operations
-├── payloads/                       # JSON payload templates
-│   ├── boundary/
-│   ├── facility/
-│   ├── household/
-│   ├── individual/
-│   ├── mdms/
-│   ├── product/
-│   └── project/
-├── data/                          # Test input data
-│   └── inputs.json
-├── output/                        # Test outputs
-│   ├── ids.txt                   # Generated entity IDs
-│   ├── response.json             # Latest API response
-│   └── boundaries.txt            # Boundary data
-├── reports/                       # Test reports
-│   └── report.html
-├── .env                          # Environment configuration
-├── pytest.ini                    # Pytest configuration
-├── requirements.txt              # Python dependencies
-└── README.md                     # This file
-```
-
----
-
-## Architecture
-
-### Core Components
-
-1. **API Client Layer** (`utils/api_client.py`)
-   - Abstraction over HTTP requests
-   - Automatic authentication header injection
-   - Support for GET, POST, PUT, DELETE methods
-
-2. **Authentication Module** (`utils/auth.py`)
-   - OAuth2 token acquisition
-   - Token caching per service
-
-3. **Configuration Management** (`utils/config.py`)
-   - Centralized environment variable loading
-   - Reusable search parameters
-   - Service-specific configurations
-
-4. **Payload Management** (`utils/data_loader.py`)
-   - Dynamic JSON payload loading
-   - Template-based payload structure
-
-5. **Request Metadata** (`utils/request_info.py`)
-   - Standardized RequestInfo object creation
-   - API metadata and user context
-
-6. **Search Helpers** (`utils/search_helpers.py`)
-   - Generic search functionality
-   - ID extraction from output files
-   - Reusable across multiple services
-
-### Test Flow
-
-```
-Test Execution
-    ↓
-Authentication (get_auth_token)
-    ↓
-API Client Initialization
-    ↓
-Load Payload Template (data_loader)
-    ↓
-Inject Dynamic Data (UUID, IDs, etc.)
-    ↓
-Add RequestInfo
-    ↓
-API Call (via APIClient)
-    ↓
-Validate Response (assertions)
-    ↓
-Store IDs/Data (output files)
-    ↓
-Generate Reports
+API_Automation/
+├── tests/                                  # Test modules (sequential execution)
+│   ├── test_01_boundary_hierarchy_create.py
+│   ├── test_02_boundary_hierarchy_search.py
+│   ├── test_03_localization_upsert.py
+│   ├── test_04_localization_search.py
+│   ├── test_05_generate_data.py
+│   ├── test_06_generate_search.py
+│   ├── test_07_file_download.py
+│   ├── test_08_file_upload.py
+│   ├── test_09_process_data.py
+│   ├── test_10_process_search.py
+│   ├── test_11_file_download_processed.py
+│   ├── test_12_localization_search_french.py
+│   ├── test_13_localization_search_portuguese.py
+│   ├── test_14_localization_search_english.py
+│   └── test_15_boundary_relationship_search.py
+├── utils/                                  # Utility modules
+│   ├── api_client.py                      # HTTP client wrapper
+│   ├── auth.py                            # Authentication token management
+│   ├── config.py                          # Configuration loader
+│   ├── data_loader.py                     # Payload loader
+│   ├── request_info.py                    # Request metadata builder
+│   └── sample_boundary.xlsx               # Reference sample boundary data (NEVER modify)
+├── payloads/                               # JSON payload templates
+│   ├── boundary_hierarchy/
+│   │   └── create_hierarchy.json         # Hierarchy definition (7-level structure)
+│   ├── boundary_management/
+│   │   ├── generate_search.json          # Search generation status
+│   │   └── process_data.json             # Process uploaded boundary data
+│   ├── boundary_relationships/
+│   │   └── search_relationships.json     # Search boundary relationships
+│   └── localization/
+│       └── upsert.json                    # Upsert localization messages
+├── output/                                 # Test outputs (generated at runtime)
+│   ├── .gitkeep                           # Keep directory in git
+│   ├── ids.txt                            # Generated hierarchy types and IDs
+│   ├── template_downloaded.xlsx           # Downloaded boundary template
+│   └── sample_boundary.xlsx               # Prepared file for upload
+├── reports/                                # Test reports
+│   └── report.html                        # HTML test report
+├── prepare_template_for_upload.py         # Template automation script
+├── .env                                   # Environment configuration (not in git)
+├── pytest.ini                             # Pytest configuration
+├── requirements.txt                       # Python dependencies
+└── README.md                              # This file
 ```
 
 ---
@@ -137,6 +88,7 @@ Generate Reports
 - **pip**: Python package manager
 - **Virtual Environment**: Recommended for dependency isolation
 - **Git**: For version control
+- **openpyxl**: For Excel file operations
 
 ---
 
@@ -145,8 +97,8 @@ Generate Reports
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd api_automation_project
+git clone https://github.com/Shreya-egov/API_Automation.git
+cd API_Automation
 ```
 
 ### 2. Create Virtual Environment
@@ -159,36 +111,37 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 ### 3. Install Dependencies
 
 ```bash
-pip install python-dotenv requests pytest pytest-html pytest-metadata allure-pytest
+pip install -r requirements.txt
+```
+
+Or install manually:
+
+```bash
+pip install python-dotenv requests pytest pytest-html pytest-metadata allure-pytest openpyxl
 ```
 
 ### 4. Configure Environment
 
-Create or update `.env` file with your environment-specific values:
+Create `.env` file in the project root:
 
 ```env
-BASE_URL=https://your-api-server.com
+# API Configuration
+BASE_URL=https://unified-qa.digit.org
 USERNAME=your_username
 PASSWORD=your_password
-TENANTID=your_tenant
+TENANTID=mz
 USERTYPE=EMPLOYEE
 CLIENT_AUTH_HEADER=Basic <base64_encoded_credentials>
 
+# Search Configuration
 SEARCH_LIMIT=200
 SEARCH_OFFSET=0
-
-HIERARCHYTYPE=MICROPLAN
-BOUNDARY_TYPE=LOCALITY
-BOUNDARY_CODE=your_boundary_code
-SERVICE_INDIVIDUAL=individual
-SERVICE_PROJECT=project
-SERVICE_MDMS=mdms-v2
 ```
 
 ### 5. Verify Setup
 
 ```bash
-pytest tests/ -v
+pytest tests/test_01_boundary_hierarchy_create.py -v
 ```
 
 ---
@@ -199,20 +152,14 @@ pytest tests/ -v
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `BASE_URL` | API base URL | `https://hcm-demo.digit.org` |
-| `USERNAME` | API username | `LNMZ` |
+| `BASE_URL` | API base URL | `https://unified-qa.digit.org` |
+| `USERNAME` | API username | `MDMSMZ` |
 | `PASSWORD` | API password | `eGov@1234` |
 | `TENANTID` | Tenant identifier | `mz` |
 | `USERTYPE` | User type | `EMPLOYEE` |
 | `CLIENT_AUTH_HEADER` | Basic auth header for OAuth | `Basic ZWdvdi11c2VyLWNsaWVudDo=` |
 | `SEARCH_LIMIT` | Default search limit | `200` |
 | `SEARCH_OFFSET` | Default search offset | `0` |
-| `HIERARCHYTYPE` | Boundary hierarchy type | `MICROPLAN` |
-| `BOUNDARY_TYPE` | Boundary type | `LOCALITY` |
-| `BOUNDARY_CODE` | Boundary code | `MICROPLAN_MO_13_03_02_03_02_TUGLOR` |
-| `SERVICE_INDIVIDUAL` | Individual service name | `individual` |
-| `SERVICE_PROJECT` | Project service name | `project` |
-| `SERVICE_MDMS` | MDMS service name | `mdms-v2` |
 
 ### Pytest Configuration (pytest.ini)
 
@@ -225,171 +172,149 @@ This ensures the root directory is in the Python path for imports.
 
 ---
 
-## Services Covered
+## Test Suite
 
-| Service | Operations | Test File |
-|---------|-----------|-----------|
-| **Individual** | Create, Search | `test_individual_service.py` |
-| **Household** | Create Household, Create Member, Search Household, Search Member | `test_household_service.py` |
-| **Boundary** | Search with hierarchy | `test_boundary_service.py` |
-| **Facility** | Create, Search | `test_facility_service.py` |
-| **Product** | Create Product, Create Variant, Search Product, Search Variant | `test_product_service.py` |
-| **Project** | Create, Search | `test_project_service.py` |
-| **MDMS** | Search master data | `test_mdms_service.py` |
+### Test Execution Flow
 
-**Total: 7 Services, 16 Payload Templates**
+The test suite consists of 15 sequential tests that validate the complete boundary management workflow:
 
----
+| # | Test Name | Description | Dependencies |
+|---|-----------|-------------|--------------|
+| 01 | Boundary Hierarchy Create | Create 7-level boundary hierarchy (COUNTRY → PROVINCE → DISTRICT → POST ADMINISTRATIVE → LOCALITY → HEALTH FACILITY → VILLAGE) | None |
+| 02 | Boundary Hierarchy Search | Verify created hierarchy exists | Test 01 |
+| 03 | Localization Upsert | Upsert localization messages for boundary types | Test 01 |
+| 04 | Localization Search | Search and validate localization messages | Test 03 |
+| 05 | Generate Data | Trigger boundary template generation | Test 01 |
+| 06 | Generate Search | Check generation status until completed | Test 05 |
+| 07 | File Download | Download generated template from S3 | Test 06 |
+| 08 | File Upload | Upload populated boundary data template | Test 07 |
+| 09 | Process Data | Process uploaded boundary data | Test 08 |
+| 10 | Process Search | Check processing status | Test 09 |
+| 11 | File Download Processed | Download processed boundary file | Test 10 |
+| 12 | Localization Search French | Validate French localization | Test 03 |
+| 13 | Localization Search Portuguese | Validate Portuguese localization | Test 03 |
+| 14 | Localization Search English | Validate English localization | Test 03 |
+| 15 | Boundary Relationship Search | Search boundary hierarchical relationships | Test 09 |
 
-## Writing Tests
+### Boundary Hierarchy Structure
 
-### Test Structure
+The tests create and validate a 7-level boundary hierarchy:
 
-Each test module follows this pattern:
-
-```python
-# 1. Imports
-from utils.api_client import APIClient
-from utils.auth import get_auth_token
-from utils.data_loader import load_payload
-from utils.request_info import get_request_info
-
-# 2. Test Functions (with assertions)
-def test_create_entity():
-    """Test case with assertions"""
-    token = get_auth_token("user")
-    client = APIClient(token=token)
-
-    response = create_entity(token, client)
-
-    # Assertions
-    assert response.status_code in [200, 202], f"Failed: {response.text}"
-    entity_id = response.json()["Entity"]["id"]
-    assert entity_id, "Entity ID not generated"
-
-    # Store ID for later use
-    with open("output/ids.txt", "a") as f:
-        f.write(f"Entity ID: {entity_id}\n")
-
-# 3. Helper Functions (reusable, no assertions)
-def create_entity(token, client):
-    """Helper function for entity creation"""
-    payload = load_payload("service_name", "create_entity.json")
-
-    # Inject dynamic data
-    payload["Entity"]["clientReferenceId"] = str(uuid.uuid4())
-    payload["RequestInfo"] = get_request_info(token)
-
-    return client.post("/service/v1/_create", payload)
+```
+COUNTRY (Level 1)
+└── PROVINCE (Level 2)
+    └── DISTRICT (Level 3)
+        └── POST ADMINISTRATIVE (Level 4)
+            └── LOCALITY (Level 5)
+                └── HEALTH FACILITY (Level 6)
+                    └── VILLAGE (Level 7)
 ```
 
-### Key Principles
+**Important**: All boundary types use UPPERCASE naming for consistency. The `create_hierarchy.json` payload defines this structure.
 
-1. **Separation of Concerns**: Test functions contain assertions; helper functions contain reusable logic
-2. **Token Reuse**: Obtain token once per test, reuse across operations
-3. **Dynamic Data Injection**: Use UUID for unique identifiers, extract IDs from output files for dependencies
-4. **Status Code Flexibility**: Accept both 200 (OK) and 202 (Accepted)
-5. **Detailed Error Messages**: Include response text in assertion failures
+### Key Test Features
 
-### Adding a New Service
-
-1. **Create Payload Directory**:
-   ```bash
-   mkdir payloads/new_service
-   ```
-
-2. **Add Payload Templates**:
-   ```bash
-   # Create JSON files for create, search operations
-   touch payloads/new_service/create_entity.json
-   touch payloads/new_service/search_entity.json
-   ```
-
-3. **Create Test File**:
-   ```bash
-   touch tests/test_new_service.py
-   ```
-
-4. **Implement Tests**:
-   ```python
-   from utils.api_client import APIClient
-   from utils.auth import get_auth_token
-   from utils.data_loader import load_payload
-   from utils.request_info import get_request_info
-   import uuid
-
-   def test_create_new_entity():
-       token = get_auth_token("user")
-       client = APIClient(token=token)
-
-       response = create_new_entity(token, client)
-       assert response.status_code in [200, 202]
-
-   def create_new_entity(token, client):
-       payload = load_payload("new_service", "create_entity.json")
-       payload["Entity"]["clientReferenceId"] = str(uuid.uuid4())
-       payload["RequestInfo"] = get_request_info(token)
-       return client.post("/new-service/v1/_create", payload)
-   ```
+1. **Dynamic Hierarchy Generation**: Each test run creates a unique hierarchy type (e.g., `TEST_D35387CC`)
+2. **ID Tracking**: Generated IDs stored in `output/ids.txt` for cross-test references
+3. **Template Automation**: Automated download, population, and upload of boundary templates
+4. **Multi-language Support**: Localization testing in English, French, and Portuguese
+5. **Status Polling**: Tests wait for asynchronous operations to complete
 
 ---
 
 ## Running Tests
 
-### Normal Execution
+### Run All Tests
 
 ```bash
 # Activate virtual environment
 source venv/bin/activate
 
-# Run all tests
-pytest tests/
-
-# Run specific test file
-pytest tests/test_individual_service.py
-
-# Run specific test function
-pytest tests/test_individual_service.py::test_create_individual
-
-# Run with verbose output
+# Run complete test suite
 pytest tests/ -v
 
-# Run with print statements visible
+# Run with output visible
 pytest tests/ -s
-```
 
-### HTML Report Generation
-
-```bash
+# Run with HTML report
 pytest tests/ --html=reports/report.html --self-contained-html
 ```
 
-The HTML report will be generated at `reports/report.html` with:
-- Test results summary
-- Pass/Fail status
-- Execution time
-- Error details
-
-### Allure Report Generation
+### Run Specific Tests
 
 ```bash
-# Generate Allure results
-pytest --alluredir=allure-results
+# Run single test
+pytest tests/test_01_boundary_hierarchy_create.py -v
 
-# Generate Allure report
-allure generate allure-results --clean -o allure-report
+# Run specific test function
+pytest tests/test_01_boundary_hierarchy_create.py::test_boundary_hierarchy_create -v
 
-# Open Allure report in browser
-allure open allure-report
+# Run tests 1-8 only
+pytest tests/test_01_boundary_hierarchy_create.py tests/test_02_boundary_hierarchy_search.py tests/test_03_localization_upsert.py tests/test_04_localization_search.py tests/test_05_generate_data.py tests/test_06_generate_search.py tests/test_07_file_download.py tests/test_08_file_upload.py -v
 ```
 
-### Fresh Test Run (Clear Previous IDs)
+### Fresh Test Run (Recommended)
+
+Clear previous test data before running:
 
 ```bash
-echo "=== New Test Run ===" > output/ids.txt && pytest tests/ --html=reports/report.html --self-contained-html
+# Clear output directory (keeps .gitkeep)
+rm -f output/ids.txt output/*.xlsx
+
+# Run tests
+pytest tests/ -v --html=reports/report.html --self-contained-html
 ```
 
-This clears the `output/ids.txt` file before running tests, ensuring no stale IDs are used.
+### Test Execution Notes
+
+1. **Sequential Execution**: Tests must run in order (01 → 15) due to dependencies
+2. **Test 08 Preparation**: Run `prepare_template_for_upload.py` before Test 08 to populate the template
+3. **Test 11 Skipping**: May skip if processed file isn't ready
+4. **Network Timeouts**: File download/upload tests may take longer on slow connections
+
+---
+
+## Template Automation
+
+### prepare_template_for_upload.py
+
+This script automates Test 08 preparation by:
+1. Downloading the template from S3 (generated in Test 07)
+2. Loading the reference sample data from `utils/sample_boundary.xlsx`
+3. Copying data rows (excluding headers) to the downloaded template
+4. Saving the populated template as `output/sample_boundary.xlsx`
+
+**Usage**:
+
+```bash
+# After Test 07 passes, run:
+python3 prepare_template_for_upload.py
+
+# Then run Test 08:
+pytest tests/test_08_file_upload.py -v
+```
+
+**Script Flow**:
+
+```
+1. Get download URL from API (using Generated FileStore ID from ids.txt)
+2. Download template from S3 → output/template_downloaded.xlsx
+3. Load reference sample → utils/sample_boundary.xlsx
+4. Extract headers from downloaded template (keep these - they match current hierarchy)
+5. Copy data rows from sample (rows 2+)
+6. Save populated template → output/sample_boundary.xlsx
+7. Verify content and display summary
+```
+
+### Reference Sample File
+
+**Location**: `utils/sample_boundary.xlsx`
+
+**Important**: This file should NEVER be modified. It contains the reference boundary structure:
+- 7 data rows representing the complete hierarchy
+- Mozambique → Tete → Cahora Bassa → Chitima → Chibagadigo → CS de Chirodze Ponte → Chissua sedew
+- Includes localization columns (French, Portuguese)
+- Contains coordinate data (Latitude, Longitude)
 
 ---
 
@@ -398,28 +323,48 @@ This clears the `output/ids.txt` file before running tests, ensuring no stale ID
 ### Output Files
 
 1. **output/ids.txt**
-   - Stores entity IDs created during test execution
-   - Format: `Entity Type ID: <id_value>`
-   - Used by subsequent tests to reference created entities
+   - Stores hierarchy type and generated IDs
+   - Format:
+     ```
+     Hierarchy Type: TEST_D35387CC
+     Generate ID: 7584fdcf-d7db-45a7-bc10-57256edd71ed
+     Generated FileStore ID: c890d523-59e6-4ffd-a7a9-650fab42ec97
+     Uploaded FileStore ID: 5bb7fecd-3cb2-44a9-a7cf-4b2ef5902781
+     ```
 
-2. **output/response.json**
-   - Latest API response saved for inspection
-   - Useful for debugging
+2. **output/template_downloaded.xlsx**
+   - Template downloaded from S3 in Test 07
+   - Contains headers matching current hierarchy type
+   - Initially empty (no data rows)
 
-3. **output/boundaries.txt**
-   - Boundary hierarchy information from boundary service tests
+3. **output/sample_boundary.xlsx**
+   - Populated template ready for upload in Test 08
+   - Headers from downloaded template + data from reference sample
 
 ### Report Types
 
 1. **HTML Report** (`reports/report.html`)
+   ```bash
+   pytest tests/ --html=reports/report.html --self-contained-html
+   ```
    - Self-contained HTML file
-   - Summary dashboard with pass/fail counts
-   - Detailed test results with error traces
+   - Pass/Fail summary
+   - Execution time
+   - Error details with stack traces
 
-2. **Allure Report** (`allure-report/`)
-   - Rich, interactive web-based report
+2. **Allure Report**
+   ```bash
+   # Generate results
+   pytest tests/ --alluredir=allure-results
+
+   # Generate report
+   allure generate allure-results --clean -o allure-report
+
+   # Open in browser
+   allure open allure-report
+   ```
+   - Rich interactive web report
    - Test execution trends
-   - Test categorization and filtering
    - Detailed logs and attachments
 
 ---
@@ -428,39 +373,26 @@ This clears the `output/ids.txt` file before running tests, ensuring no stale ID
 
 ### api_client.py
 
-**Class: APIClient**
-
 HTTP client wrapper with automatic authentication.
 
 ```python
 from utils.api_client import APIClient
 
 # Initialize with token
-client = APIClient(token="your_token_here")
+client = APIClient(token="your_token")
 
 # Make requests
 response = client.get("/endpoint")
 response = client.post("/endpoint", payload)
-response = client.put("/endpoint", payload)
-response = client.delete("/endpoint")
 ```
 
-**Constructor Parameters:**
-- `service` (optional): Service name to fetch token for
-- `token` (optional): Direct token value
-- Must provide either `service` or `token`
-
 **Methods:**
-- `get(endpoint, params=None)`: GET request
-- `post(endpoint, data=None)`: POST request
-- `put(endpoint, data=None)`: PUT request
-- `delete(endpoint)`: DELETE request
+- `get(endpoint)`: GET request
+- `post(endpoint, data)`: POST request with JSON data
 
 ### auth.py
 
-**Function: get_auth_token(service)**
-
-Obtains OAuth2 access token for a service.
+OAuth2 token management.
 
 ```python
 from utils.auth import get_auth_token
@@ -468,216 +400,35 @@ from utils.auth import get_auth_token
 token = get_auth_token("user")
 ```
 
-**Parameters:**
-- `service` (str): Service name (e.g., "user", "individual")
-
-**Returns:**
-- `str`: Access token
-
-**Raises:**
-- `Exception`: If authentication fails
-
 ### config.py
 
-Configuration module with environment variables.
+Environment variable loader.
 
 ```python
-from utils.config import BASE_URL, tenantId, search_params
+from utils.config import BASE_URL, tenantId
 
-# Use configuration values
 url = BASE_URL
 tenant = tenantId
-params = search_params  # Contains limit, offset, tenantId
 ```
-
-**Available Variables:**
-- `BASE_URL`: API base URL
-- `tenantId`: Tenant identifier
-- `search_limit`, `search_offset`: Pagination settings
-- `search_params`: Dictionary with limit, offset, tenantId
-- `hierarchyType`, `boundaryCode`, `boundaryType`: Boundary configs
-- `individual`, `project`, `mdms`: Service names
 
 ### data_loader.py
 
-**Function: load_payload(service_name, filename)**
-
-Loads JSON payload template.
+JSON payload loader.
 
 ```python
 from utils.data_loader import load_payload
 
-payload = load_payload("individual", "create_individual.json")
+payload = load_payload("boundary_hierarchy", "create_hierarchy.json")
 ```
-
-**Parameters:**
-- `service_name` (str): Service folder name under `payloads/`
-- `filename` (str): JSON file name
-
-**Returns:**
-- `dict`: Parsed JSON payload
 
 ### request_info.py
 
-**Function: get_request_info(token)**
-
-Creates standardized RequestInfo object.
+RequestInfo object builder.
 
 ```python
 from utils.request_info import get_request_info
 
-request_info = get_request_info(token)
-payload["RequestInfo"] = request_info
-```
-
-**Parameters:**
-- `token` (str): Authentication token
-
-**Returns:**
-- `dict`: RequestInfo object with API metadata, user context, and authentication
-
-### search_helpers.py
-
-**Function: search_entity(...)**
-
-Generic search operation for entities.
-
-```python
-from utils.search_helpers import search_entity
-
-results = search_entity(
-    entity_type="Individual",
-    token=token,
-    client=client,
-    entity_id="individual_id",
-    payload_file="search_individual.json",
-    endpoint="/individual/v1/_search",
-    response_key="Individual"
-)
-```
-
-**Parameters:**
-- `entity_type` (str): Type of entity being searched
-- `token` (str): Authentication token
-- `client` (APIClient): API client instance
-- `entity_id` (str): ID to search for
-- `payload_file` (str): Payload file name
-- `endpoint` (str): API endpoint
-- `response_key` (str): Key in response containing results
-
-**Function: extract_id_from_file(label)**
-
-Extracts ID from output file.
-
-```python
-from utils.search_helpers import extract_id_from_file
-
-individual_id = extract_id_from_file("Individual ID:")
-```
-
-**Parameters:**
-- `label` (str): Label to search for in output/ids.txt
-
-**Returns:**
-- `str`: Extracted ID value
-
----
-
-## Best Practices
-
-### 1. Test Independence
-
-- Each test should be independent and not rely on execution order
-- Use output files for sharing data between tests that must run sequentially
-- Clean up test data when possible
-
-### 2. Error Handling
-
-- Always include response text in assertion messages for debugging
-- Use try-except blocks for critical operations
-- Log errors to output files
-
-### 3. Payload Management
-
-- Keep payloads as templates with minimal hardcoded values
-- Inject dynamic data (UUIDs, IDs) at runtime
-- Reuse payloads across similar tests
-
-### 4. Code Reusability
-
-- Extract common operations into helper functions
-- Use utility modules for shared functionality
-- Follow DRY (Don't Repeat Yourself) principle
-
-### 5. Documentation
-
-- Add docstrings to test functions and helpers
-- Comment complex logic
-- Keep README updated with new services/features
-
-### 6. Version Control
-
-- Commit frequently with meaningful messages
-- Use feature branches for new services
-- Keep `.env` file out of version control (add to `.gitignore`)
-
----
-
-## Git Workflow
-
-### Working with Branches
-
-```bash
-# Check current branch
-git status
-
-# Switch to main branch
-git checkout main
-
-# Pull latest changes
-git pull origin main
-
-# Create new feature branch
-git checkout -b feature/new-service
-
-# Make changes and commit
-git add .
-git commit -m "Add new service tests"
-
-# Push feature branch
-git push origin feature/new-service
-```
-
-### Merging Branches
-
-```bash
-# Switch to main branch
-git checkout main
-
-# Pull latest main
-git pull origin main
-
-# Merge feature branch
-git merge feature/new-service
-
-# Push merged changes
-git push origin main
-```
-
-### Merging Product Branch to Main
-
-```bash
-# Make sure you're on main
-git checkout main
-
-# Pull latest main branch from remote
-git pull origin main
-
-# Merge product branch into main
-git merge product
-
-# Push merged changes back to remote main
-git push origin main
+payload["RequestInfo"] = get_request_info(token)
 ```
 
 ---
@@ -686,35 +437,96 @@ git push origin main
 
 ### Common Issues
 
-1. **Authentication Failure**
-   - Verify `.env` credentials are correct
-   - Check CLIENT_AUTH_HEADER is properly base64 encoded
-   - Ensure token hasn't expired
+**1. Test 01 Fails: "INVALID_HIERARCHY_DEFINITION"**
+- **Cause**: Case mismatch in boundary types
+- **Solution**: Ensure all boundary types in `payloads/boundary_hierarchy/create_hierarchy.json` use UPPERCASE (COUNTRY, not Country)
 
-2. **Import Errors**
-   - Verify virtual environment is activated
-   - Check `pytest.ini` has `pythonpath = .`
-   - Install all required dependencies
+**2. Test 08 Skipped: "Sample file not found"**
+- **Cause**: `output/sample_boundary.xlsx` doesn't exist
+- **Solution**: Run `prepare_template_for_upload.py` after Test 07 completes
 
-3. **Test Failures**
-   - Check API endpoint availability
-   - Verify payload structure matches API requirements
-   - Review `output/response.json` for error details
+**3. Test 09 Fails: "BOUNDARY_SHEET_HEADER_ERROR"**
+- **Cause**: Template headers don't match hierarchy definition
+- **Solution**:
+  - Delete `output/template_downloaded.xlsx` and `output/sample_boundary.xlsx`
+  - Re-run from Test 07 onwards
+  - Ensure `prepare_template_for_upload.py` uses the correct template
 
-4. **Missing IDs**
-   - Ensure prerequisite tests ran successfully
-   - Check `output/ids.txt` has required IDs
-   - Run tests in correct sequence
+**4. Authentication Failure**
+- **Cause**: Invalid credentials or expired token
+- **Solution**:
+  - Verify `.env` credentials
+  - Check `CLIENT_AUTH_HEADER` is properly base64 encoded
+  - Test authentication: `python3 -c "from utils.auth import get_auth_token; print(get_auth_token('user'))"`
+
+**5. Module Import Errors**
+- **Cause**: Virtual environment not activated or missing dependencies
+- **Solution**:
+  ```bash
+  source venv/bin/activate
+  pip install -r requirements.txt
+  ```
+
+**6. File Upload Timeout**
+- **Cause**: Large file or slow network
+- **Solution**: Increase timeout in Test 08 or check network connection
+
+### Debug Mode
+
+Run tests with maximum verbosity:
+
+```bash
+pytest tests/ -vv -s --tb=long
+```
+
+**Flags:**
+- `-vv`: Very verbose output
+- `-s`: Show print statements
+- `--tb=long`: Long traceback format
+
+---
+
+## Recent Fixes (2025-11-20)
+
+### Fix: Boundary Hierarchy Case Mismatch
+
+**Commit**: `7a76f47` - "Fix boundary hierarchy case mismatch and add template automation"
+
+**Changes:**
+1. Fixed `payloads/boundary_hierarchy/create_hierarchy.json`:
+   - Changed `"Country"` → `"COUNTRY"`
+   - Changed `parentBoundaryType: "Country"` → `"COUNTRY"`
+
+2. Updated `tests/test_03_localization_upsert.py`:
+   - Changed localization code from `f"{hierarchy_type}_Country"` → `f"{hierarchy_type}_COUNTRY"`
+
+3. Added `prepare_template_for_upload.py` for template automation
+
+4. Added `utils/sample_boundary.xlsx` as permanent reference file
+
+**Result**: All 15 tests now pass (14 passed, 1 skipped)
+
+---
+
+## Best Practices
+
+1. **Always run tests in sequence**: Tests 01-15 have dependencies
+2. **Clear output directory** before fresh runs to avoid stale data
+3. **Never modify** `utils/sample_boundary.xlsx` - it's the reference template
+4. **Use prepare_template_for_upload.py** for Test 08 to ensure proper header matching
+5. **Keep .env out of git** - it contains sensitive credentials
+6. **Commit frequently** with meaningful messages
+7. **Review output/ids.txt** after each test run to verify ID generation
 
 ---
 
 ## Contributing
 
-1. Create a feature branch
+1. Create a feature branch: `git checkout -b feature/new-test`
 2. Make changes with clear commit messages
 3. Add tests for new functionality
 4. Update documentation
-5. Create pull request
+5. Create pull request to `main` branch
 
 ---
 
@@ -726,8 +538,9 @@ git push origin main
 
 ## Contact
 
-[Add contact information here]
+- Repository: https://github.com/Shreya-egov/API_Automation
+- Issues: https://github.com/Shreya-egov/API_Automation/issues
 
 ---
 
-**Last Updated**: 2025-10-27
+**Last Updated**: 2025-11-20
