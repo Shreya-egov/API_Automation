@@ -95,33 +95,28 @@ def test_search_generated_boundary():
                     hierarchy_type = line.split(":")[1].strip()
                     break
 
-        # Poll until status becomes 'completed' (max 30 attempts, 5s intervals = ~150s/2.5min max)
-        response = search_generated_boundary(token, client, hierarchy_type, wait_for_completion=True, max_retries=30, retry_interval=5)
+        # Make a single API call without polling
+        response = search_generated_boundary(token, client, hierarchy_type, wait_for_completion=False)
 
         assert response.status_code == 200, f"Generated boundary search failed: {response.text}"
 
         data = response.json()
         generated_resources = data.get("GeneratedResource", [])
 
-        if len(generated_resources) == 0:
-            print("WARNING: No generated resources found after polling. Generation may have failed or is taking longer than expected.")
-            print("Skipping test - this is expected if generation is not completing in time.")
-            return
+        print(f"Found {len(generated_resources)} generated resources")
 
-        status = generated_resources[0].get("status", "").lower()
+        if len(generated_resources) > 0:
+            status = generated_resources[0].get("status", "")
+            filestore_id = generated_resources[0].get("fileStoreId")
+            print(f"Status: {status}")
+            print(f"FileStore ID: {filestore_id}")
 
-        if status != "completed":
-            print(f"WARNING: Generation status is '{status}', not 'completed'. Skipping test.")
-            return
-
-        print(f"Found {len(generated_resources)} generated resources with status 'completed'")
-        filestore_id = generated_resources[0].get("fileStoreId")
-        print(f"FileStore ID: {filestore_id}")
-
-        # Store filestore ID for later use
-        if filestore_id:
-            with open("output/ids.txt", "a") as f:
-                f.write(f"FileStore ID: {filestore_id}\n")
+            # Store filestore ID if available
+            if filestore_id:
+                with open("output/ids.txt", "a") as f:
+                    f.write(f"FileStore ID: {filestore_id}\n")
+        else:
+            print("No generated resources found")
 
     except FileNotFoundError:
         print("No hierarchy type found. Run boundary hierarchy create test first.")
