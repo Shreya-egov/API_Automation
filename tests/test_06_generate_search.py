@@ -34,10 +34,26 @@ def test_generate_search():
     assert "GeneratedResource" in data
 
     if len(data["GeneratedResource"]) > 0:
-        file_store_id = data["GeneratedResource"][0].get("fileStoreid")
+        resource = data["GeneratedResource"][0]
+        status = resource.get("status")
+        file_store_id = resource.get("fileStoreid")  # lowercase 'id'
+        print(f"Status: {status}")
         if file_store_id:
             print(f"Generated file store ID: {file_store_id}")
-            with open("output/ids.txt", "a") as f:
-                f.write(f"Generated FileStore ID: {file_store_id}\n")
+            # Update file store ID (overwrite existing)
+            with open("output/ids.txt", "r") as f:
+                lines = f.readlines()
+
+            with open("output/ids.txt", "w") as f:
+                for line in lines:
+                    if line.startswith("Generated FileStore ID:"):
+                        f.write(f"Generated FileStore ID: {file_store_id}\n")
+                    else:
+                        f.write(line)
+                # Add if not found
+                if not any(line.startswith("Generated FileStore ID:") for line in lines):
+                    f.write(f"Generated FileStore ID: {file_store_id}\n")
+        else:
+            print("File store ID not available yet")
     else:
         print("No generated resources found yet")

@@ -27,7 +27,7 @@ def test_localization_upsert():
     payload["tenantId"] = tenantId
     payload["messages"] = [
         {
-            "code": f"{hierarchy_type}_COUNTRY",
+            "code": f"{hierarchy_type}_Country",
             "message": "Country",
             "module": f"hcm-boundary-{hierarchy_type_lower}",
             "locale": "en_MZ"

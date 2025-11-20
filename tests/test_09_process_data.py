@@ -41,10 +41,26 @@ def test_process_data():
 
     data = response.json()
     assert "ResourceDetails" in data
-    process_id = data["ResourceDetails"]["id"]
+
+    # Handle both list and dict response formats
+    resource_details = data["ResourceDetails"]
+    if isinstance(resource_details, list):
+        process_id = resource_details[0]["id"]
+    else:
+        process_id = resource_details["id"]
 
     print(f"Boundary data processing triggered: {process_id}")
 
-    # Save process ID
-    with open("output/ids.txt", "a") as f:
-        f.write(f"Process ID: {process_id}\n")
+    # Update process ID (overwrite existing)
+    with open("output/ids.txt", "r") as f:
+        lines = f.readlines()
+
+    with open("output/ids.txt", "w") as f:
+        for line in lines:
+            if line.startswith("Process ID:"):
+                f.write(f"Process ID: {process_id}\n")
+            else:
+                f.write(line)
+        # Add if not found
+        if not any(line.startswith("Process ID:") for line in lines):
+            f.write(f"Process ID: {process_id}\n")

@@ -1,10 +1,16 @@
+import time
+
 def get_request_info(token: str) -> dict:
+    # Generate timestamp|locale format for msgId
+    timestamp = int(time.time() * 1000)
+    msg_id = f"{timestamp}|en_MZ"
+
     return {
-        "apiId": "org.egov.household",
+        "apiId": "Rainmaker",
         "ver": "1.0",
         "ts": 0,
         "action": "create",
-        "msgId": "202507150001",
+        "msgId": msg_id,
         "authToken": token,
         "userInfo": {
             "id": 16164561,
@@ -19,5 +25,6 @@ def get_request_info(token: str) -> dict:
                     "tenantId": "mz"
                 }
             ]
-        }
+        },
+        "plainAccessRequest": {}
     }

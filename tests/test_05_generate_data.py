@@ -32,10 +32,26 @@ def test_generate_data():
 
     data = response.json()
     assert "ResourceDetails" in data
-    generate_id = data["ResourceDetails"]["id"]
+
+    # Handle both list and dict response formats
+    resource_details = data["ResourceDetails"]
+    if isinstance(resource_details, list):
+        generate_id = resource_details[0]["id"]
+    else:
+        generate_id = resource_details["id"]
 
     print(f"Boundary data generation triggered: {generate_id}")
 
-    # Save generate ID
-    with open("output/ids.txt", "a") as f:
-        f.write(f"Generate ID: {generate_id}\n")
+    # Update generate ID (overwrite existing)
+    with open("output/ids.txt", "r") as f:
+        lines = f.readlines()
+
+    with open("output/ids.txt", "w") as f:
+        for line in lines:
+            if line.startswith("Generate ID:"):
+                f.write(f"Generate ID: {generate_id}\n")
+            else:
+                f.write(line)
+        # Add Generate ID if not found
+        if not any(line.startswith("Generate ID:") for line in lines):
+            f.write(f"Generate ID: {generate_id}\n")

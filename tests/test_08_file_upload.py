@@ -47,6 +47,16 @@ def test_file_upload():
 
     print(f"File uploaded successfully: {file_store_id}")
 
-    # Save file store ID
-    with open("output/ids.txt", "a") as f:
-        f.write(f"Uploaded FileStore ID: {file_store_id}\n")
+    # Update file store ID (overwrite existing)
+    with open("output/ids.txt", "r") as f:
+        lines = f.readlines()
+
+    with open("output/ids.txt", "w") as f:
+        for line in lines:
+            if line.startswith("Uploaded FileStore ID:"):
+                f.write(f"Uploaded FileStore ID: {file_store_id}\n")
+            else:
+                f.write(line)
+        # Add if not found
+        if not any(line.startswith("Uploaded FileStore ID:") for line in lines):
+            f.write(f"Uploaded FileStore ID: {file_store_id}\n")
