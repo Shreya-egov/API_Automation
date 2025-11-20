@@ -360,12 +360,22 @@ pytest tests/test_08_file_upload.py -v
    # Generate report
    allure generate allure-results --clean -o allure-report
 
-   # Open in browser
+   # Open in browser (Method 1 - using allure)
    allure open allure-report
+
+   # Alternative Method 2 - if allure open fails (Java issues)
+   # Start local HTTP server
+   python3 -m http.server 8080 -d allure-report &
+   # Open in browser
+   xdg-open http://localhost:8080
+
+   # Stop the server when done
+   pkill -f "python3 -m http.server 8080"
    ```
    - Rich interactive web report
    - Test execution trends
    - Detailed logs and attachments
+   - **Note**: Use Alternative Method 2 if you encounter Java symbol lookup errors with `allure open`
 
 ---
 
