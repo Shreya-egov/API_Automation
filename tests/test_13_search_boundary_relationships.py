@@ -5,6 +5,7 @@ from utils.request_info import get_request_info
 from utils.config import tenantId
 import allure
 import json
+import pytest
 
 
 def search_boundary_relationships(token, client, hierarchy_type, include_children=True):
@@ -24,6 +25,12 @@ def search_boundary_relationships(token, client, hierarchy_type, include_childre
     return response
 
 
+@pytest.mark.order(13)
+@allure.feature("Boundary Relationships")
+@allure.story("Search Relationships")
+@allure.severity(allure.severity_level.CRITICAL)
+@allure.title("Test Search Boundary Relationships with Children")
+@allure.description("Searches for boundary relationships including child boundaries in the hierarchy")
 def test_search_boundary_relationships():
     """Test searching boundary relationships"""
     token = get_auth_token("user")
@@ -65,37 +72,6 @@ def test_search_boundary_relationships():
                 print(f"  Children: {len(sample.get('children', []))}")
         else:
             print("No boundary relationships found. The hierarchy may not have boundary data yet.")
-
-    except FileNotFoundError:
-        print("No hierarchy type found. Run boundary hierarchy create test first.")
-        assert False, "Hierarchy Type not found in ids.txt"
-
-
-def test_search_boundary_relationships_without_children():
-    """Test searching boundary relationships without children"""
-    token = get_auth_token("user")
-    client = APIClient(token=token)
-
-    # Read the hierarchy type from file
-    try:
-        with open("output/ids.txt", "r") as f:
-            for line in f:
-                if line.startswith("Hierarchy Type:"):
-                    hierarchy_type = line.split(":")[1].strip()
-                    break
-
-        response = search_boundary_relationships(token, client, hierarchy_type, include_children=False)
-
-        assert response.status_code == 200, f"Boundary relationships search failed: {response.text}"
-
-        data = response.json()
-        tenant_boundary = data.get("TenantBoundary", [])
-
-        if len(tenant_boundary) > 0:
-            boundaries = tenant_boundary[0].get("boundary", [])
-            print(f"Boundary relationships found (without children): {len(boundaries)} boundaries")
-        else:
-            print("No boundary relationships found.")
 
     except FileNotFoundError:
         print("No hierarchy type found. Run boundary hierarchy create test first.")

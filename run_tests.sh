@@ -27,7 +27,7 @@ echo ""
 
 # Step 2: Run test suite
 echo -e "${BLUE}Step 2: Running test suite...${NC}"
-pytest tests/ --alluredir=allure-results --clean-alluredir -v
+pytest tests/ --alluredir=allure-results --clean-alluredir -v -x
 
 TEST_EXIT_CODE=$?
 

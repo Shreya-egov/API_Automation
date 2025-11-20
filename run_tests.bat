@@ -18,7 +18,7 @@ echo.
 
 REM Step 2: Run test suite
 echo Step 2: Running test suite...
-pytest tests/ --alluredir=allure-results --clean-alluredir -v
+pytest tests/ --alluredir=allure-results --clean-alluredir -v -x
 set TEST_EXIT_CODE=%ERRORLEVEL%
 
 if %TEST_EXIT_CODE% NEQ 0 (

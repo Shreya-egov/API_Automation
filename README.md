@@ -207,8 +207,8 @@ The script automatically:
 ### Quick Start (Manual)
 
 ```bash
-# Run all tests with Allure results
-pytest tests/ --alluredir=allure-results -v
+# Run all tests with Allure results (stops on first failure)
+pytest tests/ --alluredir=allure-results -v -x
 
 # Generate and open report
 allure generate allure-results --clean -o allure-report
@@ -221,32 +221,33 @@ allure open allure-report
 
 #### Run All Tests
 ```bash
-pytest tests/ --alluredir=allure-results -v
+# Run all tests (stops on first failure to maintain test order)
+pytest tests/ --alluredir=allure-results -v -x
 ```
 
 #### Run Specific Test Suite
 ```bash
 # Boundary Hierarchy tests
-pytest tests/test_boundary_hierarchy_service.py --alluredir=allure-results -v
+pytest tests/test_boundary_hierarchy_service.py --alluredir=allure-results -v -x
 
 # Boundary Management tests
-pytest tests/test_boundary_management_service.py --alluredir=allure-results -v
+pytest tests/test_boundary_management_service.py --alluredir=allure-results -v -x
 
 # Filestore tests
-pytest tests/test_filestore_service.py --alluredir=allure-results -v
+pytest tests/test_filestore_service.py --alluredir=allure-results -v -x
 
 # Localization tests
-pytest tests/test_localization_service.py --alluredir=allure-results -v
+pytest tests/test_localization_service.py --alluredir=allure-results -v -x
 ```
 
 #### Run Specific Test
 ```bash
-pytest tests/test_boundary_management_service.py::test_generate_boundary_data --alluredir=allure-results -v
+pytest tests/test_boundary_management_service.py::test_generate_boundary_data --alluredir=allure-results -v -x
 ```
 
 #### Run with Clean Results (Fresh Start)
 ```bash
-pytest tests/ --alluredir=allure-results --clean-alluredir -v
+pytest tests/ --alluredir=allure-results --clean-alluredir -v -x
 ```
 
 ### Advanced Options
@@ -300,7 +301,7 @@ pkill -f "python3 -m http.server 8080"
 Run tests and serve report in one command:
 
 ```bash
-pytest tests/ --alluredir=allure-results --clean-alluredir -v && \
+pytest tests/ --alluredir=allure-results --clean-alluredir -v -x && \
 allure generate allure-results --clean -o allure-report && \
 cd allure-report && python3 -m http.server 8080
 ```

@@ -20,7 +20,7 @@ import re
 def fill_template_with_sample(template_file, hierarchy_type, sample_file="sample/sample.xlsx"):
     """
     Fill the downloaded template with data from sample file
-    Replaces any existing hierarchy type codes with the new hierarchy type
+    Keeps original template headers, only adds data rows with updated hierarchy codes
     """
     print(f"\nStep 6: Auto-filling template with sample data...")
 
@@ -33,57 +33,108 @@ def fill_template_with_sample(template_file, hierarchy_type, sample_file="sample
     try:
         filled_file = template_file.replace('.xlsx', '_filled.xlsx')
 
-        # Create a temporary directory to extract and modify
-        temp_dir = 'output/temp_xlsx'
-        if os.path.exists(temp_dir):
-            shutil.rmtree(temp_dir)
-        os.makedirs(temp_dir)
+        # Extract empty template (has correct headers)
+        temp_template = 'output/temp_template'
+        if os.path.exists(temp_template):
+            shutil.rmtree(temp_template)
+        os.makedirs(temp_template)
 
-        # Extract sample file
+        with zipfile.ZipFile(template_file, 'r') as zip_ref:
+            zip_ref.extractall(temp_template)
+
+        # Extract sample file (has data)
+        temp_sample = 'output/temp_sample'
+        if os.path.exists(temp_sample):
+            shutil.rmtree(temp_sample)
+        os.makedirs(temp_sample)
+
         with zipfile.ZipFile(sample_file, 'r') as zip_ref:
-            zip_ref.extractall(temp_dir)
+            zip_ref.extractall(temp_sample)
 
-        print(f"  ✓ Extracted sample file")
+        print(f"  ✓ Extracted template and sample files")
 
-        # Read and modify shared strings - replace any hierarchy type codes with new one
-        shared_strings_path = os.path.join(temp_dir, 'xl', 'sharedStrings.xml')
-        if os.path.exists(shared_strings_path):
-            with open(shared_strings_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+        # Read sample worksheet to get data rows (skip row 1 which is headers)
+        sample_ws_path = os.path.join(temp_sample, 'xl', 'worksheets', 'sheet1.xml')
+        with open(sample_ws_path, 'r', encoding='utf-8') as f:
+            sample_ws = f.read()
 
-            # Replace old hierarchy type patterns (like TETE5) with new hierarchy type
-            # Pattern matches WORD_WORD format (old hierarchy type codes)
-            content = re.sub(r'\b[A-Z]+\d+_', f'{hierarchy_type}_', content)
+        # Extract rows 2 onwards from sample (data rows only)
+        data_rows = re.findall(r'<row r="(?:[2-9]|\d{2,})"[^>]*>.*?</row>', sample_ws, re.DOTALL)
 
-            with open(shared_strings_path, 'w', encoding='utf-8') as f:
-                f.write(content)
+        # Merge sharedStrings: keep template headers, append sample data strings
+        sample_ss_path = os.path.join(temp_sample, 'xl', 'sharedStrings.xml')
+        template_ss_path = os.path.join(temp_template, 'xl', 'sharedStrings.xml')
 
-            print(f"  ✓ Updated localization strings with hierarchy type: {hierarchy_type}")
+        with open(sample_ss_path, 'r', encoding='utf-8') as f:
+            sample_ss = f.read()
+        with open(template_ss_path, 'r', encoding='utf-8') as f:
+            template_ss = f.read()
 
-        # Read and modify worksheet
-        worksheet_path = os.path.join(temp_dir, 'xl', 'worksheets', 'sheet1.xml')
-        if os.path.exists(worksheet_path):
-            with open(worksheet_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+        # Extract string items from sample (skip first 11 headers, start from data)
+        sample_strings = re.findall(r'<si>.*?</si>', sample_ss, re.DOTALL)
+        # Sample has 11 headers (0-10), data starts at index 11
+        data_strings = sample_strings[11:]  # Get only data strings
 
-            # Replace old hierarchy type patterns with new one
-            content = re.sub(r'\b[A-Z]+\d+_', f'{hierarchy_type}_', content)
+        # Update hierarchy codes in data strings only
+        data_strings_updated = []
+        for s in data_strings:
+            updated = re.sub(r'\b[A-Z]+\d+_', f'{hierarchy_type}_', s)
+            data_strings_updated.append(updated)
 
-            with open(worksheet_path, 'w', encoding='utf-8') as f:
-                f.write(content)
+        # Insert data strings before closing </sst> tag in template
+        template_ss_updated = template_ss.replace('</sst>', ''.join(data_strings_updated) + '</sst>')
 
-            print(f"  ✓ Updated worksheet data")
+        # Update count attributes
+        template_count = int(re.search(r'uniqueCount="(\d+)"', template_ss).group(1))
+        new_count = template_count + len(data_strings_updated)
+        template_ss_updated = re.sub(r'uniqueCount="\d+"', f'uniqueCount="{new_count}"', template_ss_updated)
+        template_ss_updated = re.sub(r'count="\d+"', f'count="{new_count}"', template_ss_updated)
 
-        # Create new xlsx file
+        with open(template_ss_path, 'w', encoding='utf-8') as f:
+            f.write(template_ss_updated)
+
+        # Adjust string indices in data rows
+        # Sample row references index N, but in merged file it should be N+1
+        # (because template has 12 headers vs sample's 11)
+        for i, row_str in enumerate(data_rows):
+            # Find all string cell references like <v>11</v>, <v>12</v>, etc.
+            def increment_index(match):
+                old_index = int(match.group(1))
+                new_index = old_index + 1
+                return f'<v>{new_index}</v>'
+
+            data_rows[i] = re.sub(r'<v>(\d+)</v>', increment_index, row_str)
+
+        # Write worksheet with adjusted data rows
+        template_ws_path = os.path.join(temp_template, 'xl', 'worksheets', 'sheet1.xml')
+        with open(template_ws_path, 'r', encoding='utf-8') as f:
+            template_ws = f.read()
+
+        row1_end = template_ws.find('</row>') + len('</row>')
+        data_rows_str = ''.join(data_rows)
+        new_ws = template_ws[:row1_end] + data_rows_str + template_ws[row1_end:]
+
+        # Update hierarchy codes in DATA rows only (not headers)
+        new_ws = re.sub(r'\b[A-Z]+\d+_', f'{hierarchy_type}_', new_ws)
+
+        with open(template_ws_path, 'w', encoding='utf-8') as f:
+            f.write(new_ws)
+
+        print(f"  ✓ Added {len(data_rows)} data rows with hierarchy type: {hierarchy_type}")
+        print(f"  ✓ Headers preserved from template")
+        print(f"  ✓ String indices adjusted for merged sharedStrings")
+
+        # Repackage
         with zipfile.ZipFile(filled_file, 'w', zipfile.ZIP_DEFLATED) as zip_ref:
-            for root, dirs, files in os.walk(temp_dir):
+            for root, dirs, files in os.walk(temp_template):
                 for file in files:
                     file_path = os.path.join(root, file)
-                    arcname = os.path.relpath(file_path, temp_dir)
+                    arcname = os.path.relpath(file_path, temp_template)
                     zip_ref.write(file_path, arcname)
 
         # Clean up
-        shutil.rmtree(temp_dir)
+        shutil.rmtree(temp_template)
+        shutil.rmtree(temp_sample)
 
         print(f"✓ Template auto-filled successfully!")
         print(f"  Filled file: {filled_file}")
@@ -139,17 +190,19 @@ def generate_and_download_template(hierarchy_type):
 
     # Step 3: Search for generated template (keep retrying until fileStoreid is available)
     print("Step 3: Searching for generated template...")
+    print("  Waiting 30 seconds for template generation to start...")
+    time.sleep(30)  # Wait 30 seconds before starting to poll
 
     file_store_id = None
-    max_attempts = 30  # 30 attempts x 3 seconds = up to 90 seconds wait
+    max_attempts = 10  # 10 attempts x 30 seconds = up to 300 seconds wait
     attempt = 0
 
     while attempt < max_attempts and not file_store_id:
         attempt += 1
 
         if attempt > 1:
-            print(f"  Waiting... (attempt {attempt}/{max_attempts})")
-            time.sleep(3)  # Wait 3 seconds between retries
+            print(f"  Waiting 30 seconds before next attempt... (attempt {attempt}/{max_attempts})")
+            time.sleep(30)  # Wait 30 seconds between retries
 
         # Search for generated template
         search_payload = load_payload("boundary_management", "generate_search.json")

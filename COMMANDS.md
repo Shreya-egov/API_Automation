@@ -32,7 +32,7 @@ run_tests.bat
 ### **Complete Test Suite Execution (One-Liner)**
 
 ```bash
-pytest tests/ --alluredir=allure-results --clean-alluredir -v && \
+pytest tests/ --alluredir=allure-results --clean-alluredir -v -x && \
 allure generate allure-results --clean -o allure-report && \
 cd allure-report && python3 -m http.server 8080
 ```
@@ -45,7 +45,7 @@ Then open: **http://localhost:8080**
 
 ### **Step 1: Run Tests**
 ```bash
-pytest tests/ --alluredir=allure-results --clean-alluredir -v
+pytest tests/ --alluredir=allure-results --clean-alluredir -v -x
 ```
 
 ### **Step 2: Copy Categories**
@@ -81,40 +81,40 @@ allure open allure-report
 
 ```bash
 # Boundary Hierarchy tests
-pytest tests/test_boundary_hierarchy_service.py --alluredir=allure-results -v
+pytest tests/test_boundary_hierarchy_service.py --alluredir=allure-results -v -x
 
 # Boundary Management tests
-pytest tests/test_boundary_management_service.py --alluredir=allure-results -v
+pytest tests/test_boundary_management_service.py --alluredir=allure-results -v -x
 
 # Boundary Relationships tests
-pytest tests/test_boundary_relationships_service.py --alluredir=allure-results -v
+pytest tests/test_boundary_relationships_service.py --alluredir=allure-results -v -x
 
 # Filestore tests
-pytest tests/test_filestore_service.py --alluredir=allure-results -v
+pytest tests/test_filestore_service.py --alluredir=allure-results -v -x
 
 # Localization tests
-pytest tests/test_localization_service.py --alluredir=allure-results -v
+pytest tests/test_localization_service.py --alluredir=allure-results -v -x
 ```
 
 ### **Run Single Test Function**
 
 ```bash
-pytest tests/test_boundary_management_service.py::test_generate_boundary_data --alluredir=allure-results -v
+pytest tests/test_boundary_management_service.py::test_generate_boundary_data --alluredir=allure-results -v -x
 ```
 
 ### **Run Tests by Feature (if markers added)**
 
 ```bash
-pytest tests/ -m "boundary_management" --alluredir=allure-results -v
+pytest tests/ -m "boundary_management" --alluredir=allure-results -v -x
 ```
 
 ---
 
 ## 🛠️ Test Execution Options
 
-### **Verbose Output**
+### **Verbose Output (with stop on first failure)**
 ```bash
-pytest tests/ --alluredir=allure-results -v
+pytest tests/ --alluredir=allure-results -v -x
 ```
 
 ### **Extra Verbose (More Details)**
@@ -238,13 +238,13 @@ lsof -ti:8080 | xargs kill -9
 
 ### **CI Pipeline Command (No Browser)**
 ```bash
-pytest tests/ --alluredir=allure-results --clean-alluredir -v && \
+pytest tests/ --alluredir=allure-results --clean-alluredir -v -x && \
 allure generate allure-results --clean -o allure-report
 ```
 
 ### **CI with HTML Report Archive**
 ```bash
-pytest tests/ --alluredir=allure-results --clean-alluredir -v && \
+pytest tests/ --alluredir=allure-results --clean-alluredir -v -x && \
 allure generate allure-results --clean -o allure-report && \
 tar -czf allure-report.tar.gz allure-report/
 ```
@@ -308,10 +308,10 @@ ptw tests/ -- --alluredir=allure-results -v
 | Task | Command |
 |------|---------|
 | **Run all tests (automated)** | `./run_tests.sh` |
-| **Run all tests (manual)** | `pytest tests/ --alluredir=allure-results -v` |
+| **Run all tests (manual)** | `pytest tests/ --alluredir=allure-results -v -x` |
 | **Generate report** | `allure generate allure-results --clean -o allure-report` |
 | **Serve report** | `cd allure-report && python3 -m http.server 8080` |
-| **Complete flow (one-liner)** | `pytest tests/ --alluredir=allure-results --clean-alluredir -v && allure generate allure-results --clean -o allure-report && cd allure-report && python3 -m http.server 8080` |
+| **Complete flow (one-liner)** | `pytest tests/ --alluredir=allure-results --clean-alluredir -v -x && allure generate allure-results --clean -o allure-report && cd allure-report && python3 -m http.server 8080` |
 | **View latest hierarchy** | `grep "Hierarchy Type:" output/ids.txt \| tail -1` |
 | **Clean results** | `rm -rf allure-results/ allure-report/` |
 | **Stop server** | `pkill -f "python3 -m http.server 8080"` |
