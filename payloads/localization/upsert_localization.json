@@ -10,12 +10,5 @@
         "authToken": ""
     },
     "tenantId": "",
-    "messages": [
-        {
-            "code": "",
-            "message": "",
-            "module": "",
-            "locale": ""
-        }
-    ]
+    "messages": []
 }

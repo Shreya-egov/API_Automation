@@ -1,603 +1,733 @@
 # API Automation Framework
 
-Comprehensive API automation testing framework for Boundary Management services using Python, Pytest, and Allure reporting.
+A comprehensive Python-based API automation testing framework for microservices testing using pytest. This framework provides reusable utilities, dynamic payload management, and extensive reporting capabilities.
 
-![Tests](https://img.shields.io/badge/tests-14%20passed-brightgreen)
-![Python](https://img.shields.io/badge/python-3.12-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
-- [Features](#features)
-  - [Template Auto-Fill Feature](#template-auto-fill-feature-)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running Tests](#running-tests)
-- [Allure Reports](#allure-reports)
 - [Project Structure](#project-structure)
-- [Test Coverage](#test-coverage)
-- [Advanced Usage](#advanced-usage)
-  - [Template Download and Auto-Fill](#template-download-and-auto-fill)
-  - [Status Polling Configuration](#status-polling-configuration)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Setup and Installation](#setup-and-installation)
+- [Configuration](#configuration)
+- [Services Covered](#services-covered)
+- [Writing Tests](#writing-tests)
+- [Running Tests](#running-tests)
+- [Reporting](#reporting)
+- [Utilities Documentation](#utilities-documentation)
+- [Best Practices](#best-practices)
+- [Git Workflow](#git-workflow)
 
-## 🎯 Overview
+---
 
-This framework automates testing for Boundary Management APIs including:
-- Boundary Hierarchy Management
-- Boundary Data Generation & Processing
-- Boundary Relationships
-- File Storage Operations
-- Localization Services
+## Overview
 
-**Key Highlights:**
-- ✅ Intelligent status polling for async operations
-- ✅ Comprehensive Allure reports with request/response attachments
-- ✅ Modular and maintainable test structure
-- ✅ Data-driven testing with JSON payloads
-- ✅ Automatic test dependency management
-- ✅ Template auto-fill with sample data for quick testing
+This framework is designed to test multiple microservices with a focus on:
+- **Modularity**: Reusable utilities for authentication, API calls, and data management
+- **Maintainability**: Separation of test logic, payloads, and configuration
+- **Extensibility**: Easy addition of new services and test cases
+- **Reporting**: Multiple reporting formats (HTML, Allure)
+- **Configuration Management**: Environment-based configuration using `.env` files
 
-## 🚀 Features
+---
 
-### Test Automation
-- **Status Polling:** Automatically polls APIs until operations complete (configurable timeouts)
-- **Smart Retries:** Configurable retry mechanism for async operations
-- **Graceful Degradation:** Tests skip intelligently when dependencies are unavailable
-- **Data Persistence:** Stores generated IDs and hierarchy types for test chaining
+## Project Structure
 
-### Reporting
-- **Allure Integration:** Rich, interactive HTML reports
-- **Request/Response Capture:** Full API payload and response logging
-- **Test Categorization:** Automatic failure classification
-- **Historical Trends:** Track test execution over time
-- **Screenshots & Attachments:** JSON payloads attached to each test
-
-### Architecture
-- **Modular Design:** Separate services for different API domains
-- **Reusable Components:** Shared utilities for auth, config, and data loading
-- **Environment Management:** Easy configuration switching
-- **Clean Code:** Well-documented and maintainable
-
-### Template Auto-Fill Feature ⭐
-- **Automated Template Download:** Download boundary hierarchy templates via API
-- **Smart Data Filling:** Automatically fills templates with sample boundary data
-- **Code Replacement:** Intelligently replaces hierarchy type codes with current test data
-- **Sample File Included:** Pre-configured sample file with multi-level boundary hierarchies
-- **Seamless Integration:** Ready-to-upload files for testing
-
-Learn more: [AUTO_FILL_FEATURE.md](AUTO_FILL_FEATURE.md)
-
-## 📦 Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- **Python 3.12+**
-- **pip** (Python package manager)
-- **Git**
-- **Java 8+** (for Allure reporting)
-- **Allure Command-line** (for report generation)
-
-### Install Allure (Linux/Ubuntu)
-
-```bash
-# Install Java if not already installed
-sudo apt-get update
-sudo apt-get install openjdk-11-jdk -y
-
-# Install Allure
-sudo apt-add-repository ppa:qameta/allure
-sudo apt-get update
-sudo apt-get install allure -y
-
-# Verify installation
-allure --version
+```
+api_automation_project/
+├── tests/                          # Test modules
+│   ├── test_individual_service.py
+│   ├── test_household_service.py
+│   ├── test_boundary_service.py
+│   ├── test_facility_service.py
+│   ├── test_product_service.py
+│   ├── test_project_service.py
+│   └── test_mdms_service.py
+├── utils/                          # Utility modules
+│   ├── api_client.py              # HTTP client wrapper
+│   ├── auth.py                    # Authentication token management
+│   ├── config.py                  # Configuration loader
+│   ├── data_loader.py             # Payload loader
+│   ├── request_info.py            # Request metadata builder
+│   └── search_helpers.py          # Common search operations
+├── payloads/                       # JSON payload templates
+│   ├── boundary/
+│   ├── facility/
+│   ├── household/
+│   ├── individual/
+│   ├── mdms/
+│   ├── product/
+│   └── project/
+├── data/                          # Test input data
+│   └── inputs.json
+├── output/                        # Test outputs
+│   ├── ids.txt                   # Generated entity IDs
+│   ├── response.json             # Latest API response
+│   └── boundaries.txt            # Boundary data
+├── reports/                       # Test reports
+│   └── report.html
+├── .env                          # Environment configuration
+├── pytest.ini                    # Pytest configuration
+├── requirements.txt              # Python dependencies
+└── README.md                     # This file
 ```
 
-### Install Allure (macOS)
+---
 
-```bash
-brew install allure
+## Architecture
+
+### Core Components
+
+1. **API Client Layer** (`utils/api_client.py`)
+   - Abstraction over HTTP requests
+   - Automatic authentication header injection
+   - Support for GET, POST, PUT, DELETE methods
+
+2. **Authentication Module** (`utils/auth.py`)
+   - OAuth2 token acquisition
+   - Token caching per service
+
+3. **Configuration Management** (`utils/config.py`)
+   - Centralized environment variable loading
+   - Reusable search parameters
+   - Service-specific configurations
+
+4. **Payload Management** (`utils/data_loader.py`)
+   - Dynamic JSON payload loading
+   - Template-based payload structure
+
+5. **Request Metadata** (`utils/request_info.py`)
+   - Standardized RequestInfo object creation
+   - API metadata and user context
+
+6. **Search Helpers** (`utils/search_helpers.py`)
+   - Generic search functionality
+   - ID extraction from output files
+   - Reusable across multiple services
+
+### Test Flow
+
+```
+Test Execution
+    ↓
+Authentication (get_auth_token)
+    ↓
+API Client Initialization
+    ↓
+Load Payload Template (data_loader)
+    ↓
+Inject Dynamic Data (UUID, IDs, etc.)
+    ↓
+Add RequestInfo
+    ↓
+API Call (via APIClient)
+    ↓
+Validate Response (assertions)
+    ↓
+Store IDs/Data (output files)
+    ↓
+Generate Reports
 ```
 
-### Install Allure (Windows)
+---
 
-Download from: https://github.com/allure-framework/allure2/releases
+## Prerequisites
 
-## 🔧 Installation
+- **Python**: 3.8 or higher
+- **pip**: Python package manager
+- **Virtual Environment**: Recommended for dependency isolation
+- **Git**: For version control
+
+---
+
+## Setup and Installation
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Shreya-egov/API_Automation.git
-cd API_Automation
+git clone <repository-url>
+cd api_automation_project
 ```
 
-### 2. Create Virtual Environment (Recommended)
+### 2. Create Virtual Environment
 
 ```bash
-# Create virtual environment
 python3 -m venv venv
-
-# Activate virtual environment
-# On Linux/Mac:
-source venv/bin/activate
-
-# On Windows:
-venv\Scripts\activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 ### 3. Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install python-dotenv requests pytest pytest-html pytest-metadata allure-pytest
 ```
 
-### 4. Create Output Directory
+### 4. Configure Environment
 
-```bash
-mkdir -p output
-```
+Create or update `.env` file with your environment-specific values:
 
-## ⚙️ Configuration
-
-### 1. Create Environment File
-
-Create a `.env` file in the `utils/` directory with your configuration:
-
-```bash
-# API Configuration
-BASE_URL=https://unified-qa.digit.org
-
-# Authentication
-USERNAME=SATYA
-PASSWORD=eGov@1234
+```env
+BASE_URL=https://your-api-server.com
+USERNAME=your_username
+PASSWORD=your_password
+TENANTID=your_tenant
 USERTYPE=EMPLOYEE
-CLIENT_AUTH_HEADER=Basic ZWdvdi11c2VyLWNsaWVudDo=
+CLIENT_AUTH_HEADER=Basic <base64_encoded_credentials>
 
-# Tenant Configuration
-TENANTID=mz
-
-# Search Parameters (Optional)
-SEARCH_LIMIT=100
+SEARCH_LIMIT=200
 SEARCH_OFFSET=0
 
-# Test Data (Optional)
-HIERARCHYTYPE=
-BOUNDARY_CODE=
-BOUNDARY_TYPE=
+HIERARCHYTYPE=MICROPLAN
+BOUNDARY_TYPE=LOCALITY
+BOUNDARY_CODE=your_boundary_code
+SERVICE_INDIVIDUAL=individual
+SERVICE_PROJECT=project
+SERVICE_MDMS=mdms-v2
 ```
 
-**Note:** Update the `USERNAME` and `PASSWORD` with your actual credentials.
-
-### 2. Verify Test Data
-
-Test payloads are stored in `test_data/` directory. Review and update as needed:
-- `boundary_hierarchy/` - Hierarchy creation and search payloads
-- `boundary_management/` - Generation and processing payloads
-
-## 🏃 Running Tests
-
-### Quick Start (Automated Script)
-
-**Linux/Mac:**
-```bash
-# Make script executable (first time only)
-chmod +x run_tests.sh
-
-# Run complete test suite
-./run_tests.sh
-```
-
-**Windows:**
-```cmd
-run_tests.bat
-```
-
-The script automatically:
-- Cleans previous results
-- Runs all tests
-- Generates Allure report
-- Starts HTTP server
-- Opens report in browser
-
-### Quick Start (Manual)
+### 5. Verify Setup
 
 ```bash
-# Run all tests with Allure results (stops on first failure)
-pytest tests/ --alluredir=allure-results -v -x
-
-# Generate and open report
-allure generate allure-results --clean -o allure-report
-allure open allure-report
+pytest tests/ -v
 ```
-
-**💡 For complete command reference, see [COMMANDS.md](COMMANDS.md)**
-
-### Basic Commands
-
-#### Run All Tests
-```bash
-# Run all tests (stops on first failure to maintain test order)
-pytest tests/ --alluredir=allure-results -v -x
-```
-
-#### Run Specific Test Suite
-```bash
-# Boundary Hierarchy tests
-pytest tests/test_boundary_hierarchy_service.py --alluredir=allure-results -v -x
-
-# Boundary Management tests
-pytest tests/test_boundary_management_service.py --alluredir=allure-results -v -x
-
-# Filestore tests
-pytest tests/test_filestore_service.py --alluredir=allure-results -v -x
-
-# Localization tests
-pytest tests/test_localization_service.py --alluredir=allure-results -v -x
-```
-
-#### Run Specific Test
-```bash
-pytest tests/test_boundary_management_service.py::test_generate_boundary_data --alluredir=allure-results -v -x
-```
-
-#### Run with Clean Results (Fresh Start)
-```bash
-pytest tests/ --alluredir=allure-results --clean-alluredir -v -x
-```
-
-### Advanced Options
-
-#### Verbose Output with Print Statements
-```bash
-pytest tests/ --alluredir=allure-results -v -s
-```
-
-#### Stop on First Failure
-```bash
-pytest tests/ --alluredir=allure-results -v -x
-```
-
-#### Run Tests in Parallel (requires pytest-xdist)
-```bash
-pytest tests/ --alluredir=allure-results -v -n 4
-```
-
-#### Show Test Execution Time
-```bash
-pytest tests/ --alluredir=allure-results -v --durations=10
-```
-
-## 📊 Allure Reports
-
-### Generate and View Reports
-
-#### Method 1: Using Python HTTP Server (Recommended)
-
-This method is the most reliable and works across all environments:
-
-```bash
-# Step 1: Generate report
-allure generate allure-results --clean -o allure-report
-
-# Step 2: Start HTTP server (choose a port)
-cd allure-report
-python3 -m http.server 8080
-
-# Step 3: Open browser to http://localhost:8080
-```
-
-**Note:** The server runs in the background. To stop it, press `Ctrl+C` or use:
-```bash
-pkill -f "python3 -m http.server 8080"
-```
-
-#### Method 2: One-Liner (Complete Flow)
-
-Run tests and serve report in one command:
-
-```bash
-pytest tests/ --alluredir=allure-results --clean-alluredir -v -x && \
-allure generate allure-results --clean -o allure-report && \
-cd allure-report && python3 -m http.server 8080
-```
-
-Then open: **http://localhost:8080**
-
-#### Method 3: Using Allure Server (Alternative)
-
-```bash
-# Generate and open report (may not work on all systems)
-allure generate allure-results --clean -o allure-report
-allure open allure-report
-```
-
-**Note:** If `allure serve` or `allure open` fails with Java errors, use Method 1 (Python HTTP Server) instead.
-
-### Report Features
-
-The Allure report includes:
-
-- **Overview Dashboard** - Test execution summary and statistics
-- **Suites** - Tests organized by test files
-- **Graphs** - Visual representation of results
-- **Timeline** - Test execution timeline
-- **Behaviors** - Tests grouped by features and stories
-- **Categories** - Automatic failure classification
-- **Attachments** - Request/response payloads for every API call
-- **Polling Progress** - Status updates for async operations
-
-### Viewing Test Details
-
-Click on any test in the report to see:
-- ✅ Test status and duration
-- 📄 Request payload (JSON formatted)
-- 📄 Response status code
-- 📄 Complete response body
-- 🔄 Polling attempts (for async operations)
-- 📊 Execution steps and logs
-
-## 📁 Project Structure
-
-```
-API_Automation/
-├── tests/                                      # Test files
-│   ├── test_boundary_hierarchy_service.py     # Hierarchy creation and search
-│   ├── test_boundary_management_service.py    # Data generation and processing
-│   ├── test_boundary_relationships_service.py # Relationship queries
-│   ├── test_filestore_service.py             # File upload/download
-│   └── test_localization_service.py          # Localization operations
-│
-├── utils/                                     # Utility modules
-│   ├── api_client.py                         # HTTP client wrapper
-│   ├── auth.py                               # Authentication management
-│   ├── config.py                             # Configuration settings
-│   ├── data_loader.py                        # JSON payload loader
-│   └── request_info.py                       # Request metadata builder
-│
-├── test_data/                                # Test data and payloads
-│   ├── boundary_hierarchy/                   # Hierarchy test data
-│   │   ├── create_hierarchy.json
-│   │   └── search_hierarchy.json
-│   ├── boundary_management/                  # Management test data
-│   │   ├── generate_data.json
-│   │   ├── generate_search.json
-│   │   ├── process_data.json
-│   │   └── process_search.json
-│   └── ...
-│
-├── sample/                                   # Sample data files
-│   └── sample.xlsx                          # Sample boundary data for auto-fill
-│
-├── output/                                   # Test execution output
-│   ├── ids.txt                              # Generated IDs and hierarchy types
-│   └── hierarchy_template_*_filled.xlsx     # Auto-filled templates
-│
-├── allure-results/                          # Allure test results (generated)
-├── allure-report/                           # Allure HTML report (generated)
-│
-├── categories.json                          # Allure failure categories
-├── pytest.ini                               # Pytest configuration
-├── requirements.txt                         # Python dependencies
-├── README.md                                # This file
-├── COMMANDS.md                              # Quick command reference
-├── run_tests.sh                             # Test execution script (Linux/Mac)
-├── run_tests.bat                            # Test execution script (Windows)
-├── download_hierarchy_template.py           # Template download utility
-└── AUTO_FILL_FEATURE.md                     # Auto-fill feature documentation
-```
-
-## 🧪 Test Coverage
-
-### 1. Boundary Hierarchy Service (2 tests)
-- ✅ Create boundary hierarchy with unique type
-- ✅ Search for created hierarchy
-
-### 2. Boundary Management Service (4 tests)
-- ✅ Generate boundary data (triggers async operation)
-- ✅ Search generated boundary (polls until status = 'completed')
-- ✅ Process boundary data from template
-- ✅ Search processed boundary (polls until status = 'completed')
-
-### 3. Boundary Relationships Service (2 tests)
-- ✅ Search boundary relationships with children
-- ✅ Search boundary relationships without children
-
-### 4. Filestore Service (2 tests)
-- ✅ Upload file to filestore
-- ✅ Get download URL for uploaded file
-
-### 5. Localization Service (4 tests)
-- ✅ Upsert localization data
-- ✅ Search localization (English)
-- ✅ Search localization (French)
-- ✅ Search localization (Portuguese)
-
-**Total: 14 automated test scenarios**
-
-## 🔬 Advanced Usage
-
-### Template Download and Auto-Fill
-
-The framework includes a powerful template download and auto-fill utility:
-
-```bash
-# Download template and auto-fill with sample data
-python3 download_hierarchy_template.py
-```
-
-**What it does:**
-1. Downloads the boundary hierarchy template from the API
-2. Automatically fills it with data from `sample/sample.xlsx`
-3. Replaces hierarchy type codes (e.g., TETE5_) with your current test hierarchy type
-4. Saves a ready-to-upload filled template in `output/`
-
-**Sample Data Included:**
-- Multi-level hierarchies (Country → Province → District → Villages)
-- Post Administrative levels and Health Facilities
-- Service Boundary Codes
-- Multi-language support (English, French, Portuguese)
-- Latitude/Longitude coordinates
-
-**Output Files:**
-- `output/hierarchy_template_{TYPE}.xlsx` - Original template
-- `output/hierarchy_template_{TYPE}_filled.xlsx` - Auto-filled and ready to use
-
-For complete details, see [AUTO_FILL_FEATURE.md](AUTO_FILL_FEATURE.md)
-
-### Status Polling Configuration
-
-The framework automatically polls async APIs until completion. You can configure:
-
-```python
-# In test files
-response = search_generated_boundary(
-    token,
-    client,
-    hierarchy_type,
-    wait_for_completion=True,  # Enable polling
-    max_retries=30,            # Number of attempts
-    retry_interval=5           # Seconds between attempts
-)
-```
-
-### Accessing Generated Data
-
-```bash
-# View all generated data
-cat output/ids.txt
-
-# Get latest hierarchy type
-grep "Hierarchy Type:" output/ids.txt | tail -1
-
-# Get all resource IDs
-grep "Generate Resource ID:" output/ids.txt
-```
-
-### Custom Test Data
-
-To add new test scenarios:
-
-1. Create JSON payload in `test_data/`
-2. Load in test using `load_payload()`
-3. Add test function with Allure decorators
-
-Example:
-```python
-@allure.feature("Your Feature")
-@allure.story("Your Story")
-@allure.severity(allure.severity_level.CRITICAL)
-def test_your_scenario():
-    payload = load_payload("your_folder", "your_file.json")
-    # Your test code
-```
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### 1. Authentication Failures
-```bash
-Error: 401 Unauthorized
-Solution: Update credentials in utils/auth.py
-```
-
-#### 2. Connection Errors
-```bash
-Error: Connection refused
-Solution: Verify BASE_URL in utils/config.py and network connectivity
-```
-
-#### 3. Allure Report 404 Error
-```bash
-Solution: Use HTTP server instead of opening file directly
-cd allure-report && python3 -m http.server 8000
-```
-
-#### 4. Tests Hanging
-```bash
-Issue: Tests waiting indefinitely
-Solution: Check max_retries and retry_interval in polling functions
-```
-
-#### 5. Import Errors
-```bash
-Error: ModuleNotFoundError
-Solution: Ensure virtual environment is activated and dependencies installed
-pip install -r requirements.txt
-```
-
-### Debug Mode
-
-Run tests with verbose output and print statements:
-```bash
-pytest tests/ --alluredir=allure-results -v -s --log-cli-level=DEBUG
-```
-
-### Clean Up
-
-```bash
-# Remove generated files
-rm -rf allure-results/ allure-report/ output/ids.txt
-
-# Stop HTTP server
-pkill -f "python3 -m http.server 8000"
-```
-
-## 🤝 Contributing
-
-### Development Setup
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Make your changes
-4. Run tests: `pytest tests/`
-5. Commit changes: `git commit -m "Add your feature"`
-6. Push to branch: `git push origin feature/your-feature`
-7. Create a Pull Request
-
-### Coding Standards
-
-- Follow PEP 8 style guide
-- Add docstrings to all functions
-- Include Allure decorators for new tests
-- Update README for new features
-- Attach request/response data in tests
-
-### Test Naming Convention
-
-```python
-# Format: test_<action>_<entity>
-def test_create_boundary_hierarchy():
-def test_search_generated_boundary():
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👥 Authors
-
-- **Shreya Kumar** - [Shreya-egov](https://github.com/Shreya-egov)
-
-## 🙏 Acknowledgments
-
-- Built with [Pytest](https://pytest.org/)
-- Reporting powered by [Allure Framework](https://docs.qameta.io/allure/)
-- API testing with [Requests](https://requests.readthedocs.io/)
-
-## 📞 Support
-
-For issues and questions:
-- Create an issue on [GitHub](https://github.com/Shreya-egov/API_Automation/issues)
-- Contact: shreya.kumar@egovernments.org
 
 ---
 
-**Happy Testing! 🚀**
+## Configuration
 
-*Last Updated: November 13, 2025*
+### Environment Variables (.env)
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `BASE_URL` | API base URL | `https://hcm-demo.digit.org` |
+| `USERNAME` | API username | `LNMZ` |
+| `PASSWORD` | API password | `eGov@1234` |
+| `TENANTID` | Tenant identifier | `mz` |
+| `USERTYPE` | User type | `EMPLOYEE` |
+| `CLIENT_AUTH_HEADER` | Basic auth header for OAuth | `Basic ZWdvdi11c2VyLWNsaWVudDo=` |
+| `SEARCH_LIMIT` | Default search limit | `200` |
+| `SEARCH_OFFSET` | Default search offset | `0` |
+| `HIERARCHYTYPE` | Boundary hierarchy type | `MICROPLAN` |
+| `BOUNDARY_TYPE` | Boundary type | `LOCALITY` |
+| `BOUNDARY_CODE` | Boundary code | `MICROPLAN_MO_13_03_02_03_02_TUGLOR` |
+| `SERVICE_INDIVIDUAL` | Individual service name | `individual` |
+| `SERVICE_PROJECT` | Project service name | `project` |
+| `SERVICE_MDMS` | MDMS service name | `mdms-v2` |
+
+### Pytest Configuration (pytest.ini)
+
+```ini
+[pytest]
+pythonpath = .
+```
+
+This ensures the root directory is in the Python path for imports.
+
+---
+
+## Services Covered
+
+| Service | Operations | Test File |
+|---------|-----------|-----------|
+| **Individual** | Create, Search | `test_individual_service.py` |
+| **Household** | Create Household, Create Member, Search Household, Search Member | `test_household_service.py` |
+| **Boundary** | Search with hierarchy | `test_boundary_service.py` |
+| **Facility** | Create, Search | `test_facility_service.py` |
+| **Product** | Create Product, Create Variant, Search Product, Search Variant | `test_product_service.py` |
+| **Project** | Create, Search | `test_project_service.py` |
+| **MDMS** | Search master data | `test_mdms_service.py` |
+
+**Total: 7 Services, 16 Payload Templates**
+
+---
+
+## Writing Tests
+
+### Test Structure
+
+Each test module follows this pattern:
+
+```python
+# 1. Imports
+from utils.api_client import APIClient
+from utils.auth import get_auth_token
+from utils.data_loader import load_payload
+from utils.request_info import get_request_info
+
+# 2. Test Functions (with assertions)
+def test_create_entity():
+    """Test case with assertions"""
+    token = get_auth_token("user")
+    client = APIClient(token=token)
+
+    response = create_entity(token, client)
+
+    # Assertions
+    assert response.status_code in [200, 202], f"Failed: {response.text}"
+    entity_id = response.json()["Entity"]["id"]
+    assert entity_id, "Entity ID not generated"
+
+    # Store ID for later use
+    with open("output/ids.txt", "a") as f:
+        f.write(f"Entity ID: {entity_id}\n")
+
+# 3. Helper Functions (reusable, no assertions)
+def create_entity(token, client):
+    """Helper function for entity creation"""
+    payload = load_payload("service_name", "create_entity.json")
+
+    # Inject dynamic data
+    payload["Entity"]["clientReferenceId"] = str(uuid.uuid4())
+    payload["RequestInfo"] = get_request_info(token)
+
+    return client.post("/service/v1/_create", payload)
+```
+
+### Key Principles
+
+1. **Separation of Concerns**: Test functions contain assertions; helper functions contain reusable logic
+2. **Token Reuse**: Obtain token once per test, reuse across operations
+3. **Dynamic Data Injection**: Use UUID for unique identifiers, extract IDs from output files for dependencies
+4. **Status Code Flexibility**: Accept both 200 (OK) and 202 (Accepted)
+5. **Detailed Error Messages**: Include response text in assertion failures
+
+### Adding a New Service
+
+1. **Create Payload Directory**:
+   ```bash
+   mkdir payloads/new_service
+   ```
+
+2. **Add Payload Templates**:
+   ```bash
+   # Create JSON files for create, search operations
+   touch payloads/new_service/create_entity.json
+   touch payloads/new_service/search_entity.json
+   ```
+
+3. **Create Test File**:
+   ```bash
+   touch tests/test_new_service.py
+   ```
+
+4. **Implement Tests**:
+   ```python
+   from utils.api_client import APIClient
+   from utils.auth import get_auth_token
+   from utils.data_loader import load_payload
+   from utils.request_info import get_request_info
+   import uuid
+
+   def test_create_new_entity():
+       token = get_auth_token("user")
+       client = APIClient(token=token)
+
+       response = create_new_entity(token, client)
+       assert response.status_code in [200, 202]
+
+   def create_new_entity(token, client):
+       payload = load_payload("new_service", "create_entity.json")
+       payload["Entity"]["clientReferenceId"] = str(uuid.uuid4())
+       payload["RequestInfo"] = get_request_info(token)
+       return client.post("/new-service/v1/_create", payload)
+   ```
+
+---
+
+## Running Tests
+
+### Normal Execution
+
+```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Run all tests
+pytest tests/
+
+# Run specific test file
+pytest tests/test_individual_service.py
+
+# Run specific test function
+pytest tests/test_individual_service.py::test_create_individual
+
+# Run with verbose output
+pytest tests/ -v
+
+# Run with print statements visible
+pytest tests/ -s
+```
+
+### HTML Report Generation
+
+```bash
+pytest tests/ --html=reports/report.html --self-contained-html
+```
+
+The HTML report will be generated at `reports/report.html` with:
+- Test results summary
+- Pass/Fail status
+- Execution time
+- Error details
+
+### Allure Report Generation
+
+```bash
+# Generate Allure results
+pytest --alluredir=allure-results
+
+# Generate Allure report
+allure generate allure-results --clean -o allure-report
+
+# Open Allure report in browser
+allure open allure-report
+```
+
+### Fresh Test Run (Clear Previous IDs)
+
+```bash
+echo "=== New Test Run ===" > output/ids.txt && pytest tests/ --html=reports/report.html --self-contained-html
+```
+
+This clears the `output/ids.txt` file before running tests, ensuring no stale IDs are used.
+
+---
+
+## Reporting
+
+### Output Files
+
+1. **output/ids.txt**
+   - Stores entity IDs created during test execution
+   - Format: `Entity Type ID: <id_value>`
+   - Used by subsequent tests to reference created entities
+
+2. **output/response.json**
+   - Latest API response saved for inspection
+   - Useful for debugging
+
+3. **output/boundaries.txt**
+   - Boundary hierarchy information from boundary service tests
+
+### Report Types
+
+1. **HTML Report** (`reports/report.html`)
+   - Self-contained HTML file
+   - Summary dashboard with pass/fail counts
+   - Detailed test results with error traces
+
+2. **Allure Report** (`allure-report/`)
+   - Rich, interactive web-based report
+   - Test execution trends
+   - Test categorization and filtering
+   - Detailed logs and attachments
+
+---
+
+## Utilities Documentation
+
+### api_client.py
+
+**Class: APIClient**
+
+HTTP client wrapper with automatic authentication.
+
+```python
+from utils.api_client import APIClient
+
+# Initialize with token
+client = APIClient(token="your_token_here")
+
+# Make requests
+response = client.get("/endpoint")
+response = client.post("/endpoint", payload)
+response = client.put("/endpoint", payload)
+response = client.delete("/endpoint")
+```
+
+**Constructor Parameters:**
+- `service` (optional): Service name to fetch token for
+- `token` (optional): Direct token value
+- Must provide either `service` or `token`
+
+**Methods:**
+- `get(endpoint, params=None)`: GET request
+- `post(endpoint, data=None)`: POST request
+- `put(endpoint, data=None)`: PUT request
+- `delete(endpoint)`: DELETE request
+
+### auth.py
+
+**Function: get_auth_token(service)**
+
+Obtains OAuth2 access token for a service.
+
+```python
+from utils.auth import get_auth_token
+
+token = get_auth_token("user")
+```
+
+**Parameters:**
+- `service` (str): Service name (e.g., "user", "individual")
+
+**Returns:**
+- `str`: Access token
+
+**Raises:**
+- `Exception`: If authentication fails
+
+### config.py
+
+Configuration module with environment variables.
+
+```python
+from utils.config import BASE_URL, tenantId, search_params
+
+# Use configuration values
+url = BASE_URL
+tenant = tenantId
+params = search_params  # Contains limit, offset, tenantId
+```
+
+**Available Variables:**
+- `BASE_URL`: API base URL
+- `tenantId`: Tenant identifier
+- `search_limit`, `search_offset`: Pagination settings
+- `search_params`: Dictionary with limit, offset, tenantId
+- `hierarchyType`, `boundaryCode`, `boundaryType`: Boundary configs
+- `individual`, `project`, `mdms`: Service names
+
+### data_loader.py
+
+**Function: load_payload(service_name, filename)**
+
+Loads JSON payload template.
+
+```python
+from utils.data_loader import load_payload
+
+payload = load_payload("individual", "create_individual.json")
+```
+
+**Parameters:**
+- `service_name` (str): Service folder name under `payloads/`
+- `filename` (str): JSON file name
+
+**Returns:**
+- `dict`: Parsed JSON payload
+
+### request_info.py
+
+**Function: get_request_info(token)**
+
+Creates standardized RequestInfo object.
+
+```python
+from utils.request_info import get_request_info
+
+request_info = get_request_info(token)
+payload["RequestInfo"] = request_info
+```
+
+**Parameters:**
+- `token` (str): Authentication token
+
+**Returns:**
+- `dict`: RequestInfo object with API metadata, user context, and authentication
+
+### search_helpers.py
+
+**Function: search_entity(...)**
+
+Generic search operation for entities.
+
+```python
+from utils.search_helpers import search_entity
+
+results = search_entity(
+    entity_type="Individual",
+    token=token,
+    client=client,
+    entity_id="individual_id",
+    payload_file="search_individual.json",
+    endpoint="/individual/v1/_search",
+    response_key="Individual"
+)
+```
+
+**Parameters:**
+- `entity_type` (str): Type of entity being searched
+- `token` (str): Authentication token
+- `client` (APIClient): API client instance
+- `entity_id` (str): ID to search for
+- `payload_file` (str): Payload file name
+- `endpoint` (str): API endpoint
+- `response_key` (str): Key in response containing results
+
+**Function: extract_id_from_file(label)**
+
+Extracts ID from output file.
+
+```python
+from utils.search_helpers import extract_id_from_file
+
+individual_id = extract_id_from_file("Individual ID:")
+```
+
+**Parameters:**
+- `label` (str): Label to search for in output/ids.txt
+
+**Returns:**
+- `str`: Extracted ID value
+
+---
+
+## Best Practices
+
+### 1. Test Independence
+
+- Each test should be independent and not rely on execution order
+- Use output files for sharing data between tests that must run sequentially
+- Clean up test data when possible
+
+### 2. Error Handling
+
+- Always include response text in assertion messages for debugging
+- Use try-except blocks for critical operations
+- Log errors to output files
+
+### 3. Payload Management
+
+- Keep payloads as templates with minimal hardcoded values
+- Inject dynamic data (UUIDs, IDs) at runtime
+- Reuse payloads across similar tests
+
+### 4. Code Reusability
+
+- Extract common operations into helper functions
+- Use utility modules for shared functionality
+- Follow DRY (Don't Repeat Yourself) principle
+
+### 5. Documentation
+
+- Add docstrings to test functions and helpers
+- Comment complex logic
+- Keep README updated with new services/features
+
+### 6. Version Control
+
+- Commit frequently with meaningful messages
+- Use feature branches for new services
+- Keep `.env` file out of version control (add to `.gitignore`)
+
+---
+
+## Git Workflow
+
+### Working with Branches
+
+```bash
+# Check current branch
+git status
+
+# Switch to main branch
+git checkout main
+
+# Pull latest changes
+git pull origin main
+
+# Create new feature branch
+git checkout -b feature/new-service
+
+# Make changes and commit
+git add .
+git commit -m "Add new service tests"
+
+# Push feature branch
+git push origin feature/new-service
+```
+
+### Merging Branches
+
+```bash
+# Switch to main branch
+git checkout main
+
+# Pull latest main
+git pull origin main
+
+# Merge feature branch
+git merge feature/new-service
+
+# Push merged changes
+git push origin main
+```
+
+### Merging Product Branch to Main
+
+```bash
+# Make sure you're on main
+git checkout main
+
+# Pull latest main branch from remote
+git pull origin main
+
+# Merge product branch into main
+git merge product
+
+# Push merged changes back to remote main
+git push origin main
+```
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Authentication Failure**
+   - Verify `.env` credentials are correct
+   - Check CLIENT_AUTH_HEADER is properly base64 encoded
+   - Ensure token hasn't expired
+
+2. **Import Errors**
+   - Verify virtual environment is activated
+   - Check `pytest.ini` has `pythonpath = .`
+   - Install all required dependencies
+
+3. **Test Failures**
+   - Check API endpoint availability
+   - Verify payload structure matches API requirements
+   - Review `output/response.json` for error details
+
+4. **Missing IDs**
+   - Ensure prerequisite tests ran successfully
+   - Check `output/ids.txt` has required IDs
+   - Run tests in correct sequence
+
+---
+
+## Contributing
+
+1. Create a feature branch
+2. Make changes with clear commit messages
+3. Add tests for new functionality
+4. Update documentation
+5. Create pull request
+
+---
+
+## License
+
+[Add license information here]
+
+---
+
+## Contact
+
+[Add contact information here]
+
+---
+
+**Last Updated**: 2025-10-27

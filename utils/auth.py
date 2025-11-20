@@ -1,16 +1,10 @@
 import os
 import requests
 from dotenv import load_dotenv
-from pathlib import Path
 from utils.config import tenantId
-import urllib3
-
-# Disable SSL warnings for self-signed certificates
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load environment variables from .env file
-env_path = Path(__file__).parent / '.env'
-load_dotenv(dotenv_path=env_path, override=True)  # This forces reloading of updated values
+load_dotenv(override=True)  # This forces reloading of updated values
 
 def get_auth_token(service: str):
     url = os.getenv("BASE_URL") + "/user/oauth/token"
@@ -32,6 +26,6 @@ def get_auth_token(service: str):
         "content-type": "application/x-www-form-urlencoded"
     }
 
-    response = requests.post(url, data=payload, headers=headers, verify=False)
+    response = requests.post(url, data=payload, headers=headers)
     assert response.status_code == 200, f"Auth failed: {response.text}"
     return response.json().get("access_token")

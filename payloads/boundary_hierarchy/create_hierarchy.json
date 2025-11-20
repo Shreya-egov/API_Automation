@@ -45,13 +45,13 @@
         "hierarchyType": "",
         "boundaryHierarchy": [
             {
-                "boundaryType": "COUNTRY",
+                "boundaryType": "Country",
                 "parentBoundaryType": null,
                 "active": true
             },
             {
                 "boundaryType": "PROVINCE",
-                "parentBoundaryType": "COUNTRY",
+                "parentBoundaryType": "Country",
                 "active": true
             },
             {

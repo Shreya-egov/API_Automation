@@ -39,5 +39,9 @@
         },
         "msgId": "1695889012604|en_MZ",
         "plainAccessRequest": {}
+    },
+    "BoundaryRelationshipSearchCriteria": {
+        "tenantId": "",
+        "hierarchyType": ""
     }
 }
