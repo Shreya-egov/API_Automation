@@ -2,7 +2,7 @@ from utils.api_client import APIClient
 from utils.auth import get_auth_token
 from utils.data_loader import load_payload
 from utils.request_info import get_request_info
-from utils.config import tenantId
+from utils.config import tenantId, locale_french
 import pytest
 
 
@@ -26,7 +26,7 @@ def test_localization_search_french():
     payload["RequestInfo"] = get_request_info(token)
 
     # Make API call with French locale
-    url = f"/localization/messages/v1/_search?tenantId={tenantId}&locale=fr_MZ&module=hcm-boundary-{hierarchy_type_lower}"
+    url = f"/localization/messages/v1/_search?tenantId={tenantId}&locale={locale_french}&module=hcm-boundary-{hierarchy_type_lower}"
     response = client.post(url, payload)
 
     assert response.status_code == 200, f"French localization search failed: {response.text}"
