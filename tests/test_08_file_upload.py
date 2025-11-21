@@ -92,6 +92,10 @@ def test_file_upload():
 
     # Make direct request
     headers = {"Authorization": f"Bearer {token}"}
+
+    print(f"Uploading file: {sample_file}")
+    print(f"File size: {os.path.getsize(sample_file)} bytes")
+
     response = requests.post(
         f"{BASE_URL}/filestore/v1/files",
         files=files,
@@ -101,6 +105,9 @@ def test_file_upload():
     )
 
     files['file'][1].close()
+
+    print(f"Response status: {response.status_code}")
+    print(f"Response body: {response.text}")
 
     assert response.status_code in [200, 201], f"File upload failed: {response.text}"
 
