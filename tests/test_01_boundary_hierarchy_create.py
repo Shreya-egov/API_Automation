@@ -5,6 +5,11 @@ from utils.request_info import get_request_info
 from utils.config import tenantId
 import pytest
 import uuid
+import json
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 @pytest.mark.order(1)
@@ -30,6 +35,14 @@ def test_boundary_hierarchy_create():
     data = response.json()
     assert "BoundaryHierarchy" in data
     assert data["BoundaryHierarchy"][0]["hierarchyType"] == hierarchy_type
+
+    # Log response details
+    logger.info("="*80)
+    logger.info("TEST 01 - BOUNDARY HIERARCHY CREATE - RESPONSE")
+    logger.info("="*80)
+    logger.info(f"Status Code: {response.status_code}")
+    logger.info(f"Response Data:\n{json.dumps(data, indent=2)}")
+    logger.info("="*80)
 
     print(f"Boundary hierarchy created successfully: {hierarchy_type}")
 

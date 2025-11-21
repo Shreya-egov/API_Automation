@@ -4,6 +4,11 @@ from utils.data_loader import load_payload
 from utils.request_info import get_request_info
 from utils.config import tenantId
 import pytest
+import json
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 @pytest.mark.order(15)
@@ -33,6 +38,14 @@ def test_boundary_relationship_search():
 
     data = response.json()
     assert "TenantBoundary" in data
+
+    # Log response details
+    logger.info("="*80)
+    logger.info("TEST 15 - BOUNDARY RELATIONSHIP SEARCH - RESPONSE")
+    logger.info("="*80)
+    logger.info(f"Status Code: {response.status_code}")
+    logger.info(f"Response Data:\n{json.dumps(data, indent=2)}")
+    logger.info("="*80)
 
     if data["TenantBoundary"] and len(data["TenantBoundary"]) > 0:
         boundary_count = len(data["TenantBoundary"][0].get("boundary", []))
