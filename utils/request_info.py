@@ -1,9 +1,10 @@
 import time
+from utils.config import locale
 
 def get_request_info(token: str) -> dict:
     # Generate timestamp|locale format for msgId
     timestamp = int(time.time() * 1000)
-    msg_id = f"{timestamp}|en_MZ"
+    msg_id = f"{timestamp}|{locale}"
 
     return {
         "apiId": "Rainmaker",

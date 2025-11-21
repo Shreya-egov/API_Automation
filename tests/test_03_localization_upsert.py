@@ -2,7 +2,7 @@ from utils.api_client import APIClient
 from utils.auth import get_auth_token
 from utils.data_loader import load_payload
 from utils.request_info import get_request_info
-from utils.config import tenantId
+from utils.config import tenantId, locale
 import pytest
 
 
@@ -30,37 +30,37 @@ def test_localization_upsert():
             "code": f"{hierarchy_type}_COUNTRY",
             "message": "Country",
             "module": f"hcm-boundary-{hierarchy_type_lower}",
-            "locale": "en_MZ"
+            "locale": locale
         },
         {
             "code": f"{hierarchy_type}_PROVINCE",
             "message": "Province",
             "module": f"hcm-boundary-{hierarchy_type_lower}",
-            "locale": "en_MZ"
+            "locale": locale
         },
         {
             "code": f"{hierarchy_type}_DISTRICT",
             "message": "Distrito",
             "module": f"hcm-boundary-{hierarchy_type_lower}",
-            "locale": "en_MZ"
+            "locale": locale
         },
         {
             "code": f"{hierarchy_type}_POST ADMINISTRATIVE",
             "message": "Post administrative",
             "module": f"hcm-boundary-{hierarchy_type_lower}",
-            "locale": "en_MZ"
+            "locale": locale
         },
         {
             "code": f"{hierarchy_type}_LOCALITY",
             "message": "Locality",
             "module": f"hcm-boundary-{hierarchy_type_lower}",
-            "locale": "en_MZ"
+            "locale": locale
         },
         {
             "code": f"{hierarchy_type}_VILLAGE",
             "message": "Village",
             "module": f"hcm-boundary-{hierarchy_type_lower}",
-            "locale": "en_MZ"
+            "locale": locale
         }
     ]
 
