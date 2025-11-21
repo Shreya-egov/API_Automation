@@ -4,6 +4,7 @@ from utils.config import tenantId, BASE_URL
 import pytest
 import requests
 import os
+import time
 from openpyxl import load_workbook
 
 
@@ -61,8 +62,15 @@ def prepare_template_for_upload(token):
         for col_idx, value in enumerate(row_data, start=1):
             template_ws.cell(row=row_idx, column=col_idx, value=value)
 
+    # Close sample workbook (read-only)
+    sample_wb.close()
+
     # Save the populated template
     template_wb.save('output/sample_boundary.xlsx')
+    template_wb.close()  # Explicitly close to ensure file is fully written
+
+    # Small delay to ensure file is fully flushed to disk
+    time.sleep(0.5)
     print(f"  Template prepared successfully")
 
 
