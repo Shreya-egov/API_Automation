@@ -1,0 +1,38 @@
+# Logs
+logs/*.log
+*.log
+!logs/README.md
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Test outputs
+output/ids.txt
+output/*.xlsx
+allure-results/
+allure-report/
+reports/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary scripts (optional - uncomment if you want to exclude)
+# show_*.py
+# view_*.py
+# copy_*.py
+# create_presentation*.py
