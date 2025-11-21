@@ -71,10 +71,16 @@ API_Automation/
 │   ├── ids.txt                            # Generated hierarchy types and IDs
 │   ├── template_downloaded.xlsx           # Downloaded boundary template
 │   └── sample_boundary.xlsx               # Prepared file for upload
-├── reports/                                # Test reports
+├── reports/                                # Test reports (excluded from git)
 │   └── report.html                        # HTML test report
+├── logs/                                   # Test execution logs (excluded from git)
+│   ├── README.md                          # Logs documentation
+│   └── *.log                              # Log files
+├── allure-results/                         # Allure test results (excluded from git)
+├── allure-report/                          # Allure HTML report (excluded from git)
 ├── prepare_template_for_upload.py         # Template automation script
-├── .env                                   # Environment configuration (not in git)
+├── .env                                   # Environment configuration (NOT in git - you must create this)
+├── .gitignore                             # Git ignore rules
 ├── pytest.ini                             # Pytest configuration
 ├── requirements.txt                       # Python dependencies
 └── README.md                              # This file
@@ -122,7 +128,16 @@ pip install python-dotenv requests pytest pytest-html pytest-metadata allure-pyt
 
 ### 4. Configure Environment
 
-Create `.env` file in the project root:
+**IMPORTANT**: Create a `.env` file in the project root directory. This file is **NOT** included in the repository for security reasons (it's excluded via `.gitignore`).
+
+Create `.env` file manually:
+
+```bash
+# Create the file
+touch .env
+```
+
+Add the following configuration to your `.env` file:
 
 ```env
 # API Configuration
@@ -133,10 +148,21 @@ TENANTID=mz
 USERTYPE=EMPLOYEE
 CLIENT_AUTH_HEADER=Basic <base64_encoded_credentials>
 
+# Localization Configuration
+LOCALE=en_MZ
+LOCALE_FRENCH=fr_MZ
+LOCALE_PORTUGUESE=pt_MZ
+
 # Search Configuration
 SEARCH_LIMIT=200
 SEARCH_OFFSET=0
 ```
+
+**⚠️ Security Notes:**
+- **NEVER commit the `.env` file to git** (it's already in `.gitignore`)
+- Replace `your_username` and `your_password` with actual credentials
+- Replace `<base64_encoded_credentials>` with proper encoded client credentials
+- Keep this file secure and don't share it publicly
 
 ### 5. Verify Setup
 
@@ -150,16 +176,21 @@ pytest tests/test_01_boundary_hierarchy_create.py -v
 
 ### Environment Variables (.env)
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `BASE_URL` | API base URL | `https://unified-qa.digit.org` |
-| `USERNAME` | API username | `MDMSMZ` |
-| `PASSWORD` | API password | `eGov@1234` |
-| `TENANTID` | Tenant identifier | `mz` |
-| `USERTYPE` | User type | `EMPLOYEE` |
-| `CLIENT_AUTH_HEADER` | Basic auth header for OAuth | `Basic ZWdvdi11c2VyLWNsaWVudDo=` |
-| `SEARCH_LIMIT` | Default search limit | `200` |
-| `SEARCH_OFFSET` | Default search offset | `0` |
+**⚠️ The `.env` file is NOT tracked in git** (excluded via `.gitignore` for security). You must create it manually on each environment.
+
+| Variable | Description | Example | Required |
+|----------|-------------|---------|----------|
+| `BASE_URL` | API base URL | `https://unified-qa.digit.org` | Yes |
+| `USERNAME` | API username | `MDMSMZ` | Yes |
+| `PASSWORD` | API password | `eGov@1234` | Yes |
+| `TENANTID` | Tenant identifier | `mz` | Yes |
+| `USERTYPE` | User type | `EMPLOYEE` | Yes |
+| `CLIENT_AUTH_HEADER` | Basic auth header for OAuth | `Basic ZWdvdi11c2VyLWNsaWVudDo=` | Yes |
+| `LOCALE` | Default locale for localization tests | `en_MZ` | Yes |
+| `LOCALE_FRENCH` | French locale | `fr_MZ` | Yes |
+| `LOCALE_PORTUGUESE` | Portuguese locale | `pt_MZ` | Yes |
+| `SEARCH_LIMIT` | Default search limit | `200` | No (default: 100) |
+| `SEARCH_OFFSET` | Default search offset | `0` | No (default: 0) |
 
 ### Pytest Configuration (pytest.ini)
 
@@ -319,6 +350,26 @@ pytest tests/test_08_file_upload.py -v
 ---
 
 ## Reporting
+
+### Test Logs
+
+Test execution logs are stored in the `logs/` directory:
+
+```bash
+# View most recent log
+cat logs/test_run_output.log
+
+# Save test run to logs with timestamp
+pytest tests/ -v -s > logs/test_run_$(date +%Y%m%d_%H%M%S).log 2>&1
+
+# View logs with pagination
+less logs/test_run_output.log
+
+# View last 50 lines
+tail -50 logs/test_run_output.log
+```
+
+See `logs/README.md` for detailed logging documentation.
 
 ### Output Files
 
@@ -524,9 +575,11 @@ pytest tests/ -vv -s --tb=long
 2. **Clear output directory** before fresh runs to avoid stale data
 3. **Never modify** `utils/sample_boundary.xlsx` - it's the reference template
 4. **Use prepare_template_for_upload.py** for Test 08 to ensure proper header matching
-5. **Keep .env out of git** - it contains sensitive credentials
-6. **Commit frequently** with meaningful messages
-7. **Review output/ids.txt** after each test run to verify ID generation
+5. **NEVER commit the `.env` file** - it contains sensitive credentials and is excluded via `.gitignore`
+6. **Create `.env` on each environment** - it's not in the repository, so you must create it manually
+7. **Commit frequently** with meaningful messages
+8. **Review output/ids.txt** after each test run to verify ID generation
+9. **Check logs/** directory for detailed test execution logs
 
 ---
 
@@ -553,4 +606,4 @@ pytest tests/ -vv -s --tb=long
 
 ---
 
-**Last Updated**: 2025-11-20
+**Last Updated**: 2025-11-21
